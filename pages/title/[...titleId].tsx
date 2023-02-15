@@ -102,7 +102,7 @@ const TitleDetail = (props: any) => {
         setDataTMDB(value);
       });
     });
-  }, [dropdownId, extraForm, query]);
+  }, [dropdownId, extraForm, query, status]);
 
   useEffect(() => {
     const cutLasso = 200;

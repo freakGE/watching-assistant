@@ -250,7 +250,7 @@ const Slider = ({
 
   useEffect(() => {
     fetchData();
-  }, [dropdownId, router.query]);
+  }, [dropdownId, router.query, status]);
 
   const handleClick = async (title: any) => {
     const type = title.media_type || queryType;

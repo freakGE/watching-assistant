@@ -171,7 +171,7 @@ const SearchResults = (moviesData: { moviesData: SearchMultiTypes }) => {
     updatedMovies().then(value => {
       startTransition(() => setMovies(value));
     });
-  }, [dropdownId, moviesData.moviesData.results]);
+  }, [dropdownId, moviesData.moviesData.results, status]);
 
   useEffect(() => {
     const cutLasso = 200;

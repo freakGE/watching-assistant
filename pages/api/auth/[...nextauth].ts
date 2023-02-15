@@ -11,6 +11,7 @@ const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
+
   providers: [
     CredentialsProvider({
       type: "credentials",
@@ -85,6 +86,11 @@ const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
       return true;
+    },
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      else if (new URL(url).origin === baseUrl) return url;
+      return baseUrl;
     },
     async session({ session, token, user }) {
       (session.user as { id: string | undefined }).id = token.sub;
