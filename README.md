@@ -3,9 +3,9 @@
   <h1 align="center">Watching Assistant</h1>
   <img src="public/thumbnail.png" alt="Michelangelo Exhibition main page">
 
-   <!-- <h3 align="center">
-    <a href="">View Demo</a>
-  </h3> -->
+   <h3 align="center">
+    <a href="https://watching-assistant.vercel.app/">View Demo</a>
+  </h3>
 </div>
 
 ## About The Project
