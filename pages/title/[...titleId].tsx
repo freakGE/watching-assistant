@@ -5,7 +5,7 @@ import Head from "next/head";
 import { useEffect, useRef, useState, useTransition } from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 import checkTitle from "@/lib/checkTitle";
 import { changeDB } from "@/lib/changeDB";
 
@@ -84,6 +84,11 @@ const TitleDetail = (props: any) => {
 
   useEffect(() => {
     const updatedMovies = async () => {
+      const session = await getSession();
+
+      if (!session) {
+        return props.data;
+      }
       const titleInfo = await checkTitle(props.data, "full");
       const variant = await checkTitle(props.data);
       if (titleInfo && titleInfo.extra) {
@@ -206,123 +211,126 @@ const TitleDetail = (props: any) => {
                   dropdown ? setDropdown(false) : setDropdown(true);
                 }}
               >
-                <div className="flex h-full w-full flex-col items-center justify-center gap-y-[1rem] overflow-hidden duration-300">
-                  <span
-                    className=" flex w-full items-center justify-center text-xl duration-300"
-                    style={{
-                      transform: dataTMDB.variant
-                        ? dropdownId === dataTMDB.id
-                          ? "translateY(calc(-100%))"
-                          : "translateY(calc(100% - 0.25rem))"
-                        : "translateY(calc(-100%))",
-                    }}
+                {dataTMDB.variant ? (
+                  <div className="flex h-full w-full flex-col items-center justify-center gap-y-[1rem] overflow-hidden duration-300">
+                    <span
+                      className=" flex w-full items-center justify-center text-xl duration-300"
+                      style={{
+                        transform: dataTMDB.variant
+                          ? dropdownId === dataTMDB.id
+                            ? "translateY(calc(-100%))"
+                            : "translateY(calc(100% - 0.25rem))"
+                          : "translateY(calc(-100%))",
+                      }}
+                    >
+                      {dataTMDB.variant}
+                      <svg
+                        className="w-[1.5rem]"
+                        stroke="currentColor"
+                        fill="currentColor"
+                        strokeWidth="0"
+                        viewBox="0 0 512 512"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path d="M128 192l128 128 128-128z"></path>
+                      </svg>
+                    </span>
+                    <span
+                      className=" flex w-full items-center justify-center duration-300"
+                      style={{
+                        transform: dataTMDB.variant
+                          ? "translateY(100%)"
+                          : "translateY(calc(-100% + 0.75rem))",
+                      }}
+                    >
+                      <svg
+                        id="Layer_1"
+                        data-name="Layer 1"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        className="w-[2rem] duration-200 hover:opacity-90"
+                      >
+                        <line
+                          fill="none"
+                          stroke="currentColor"
+                          strokeMiterlimit={10}
+                          x1="7.23"
+                          y1="14.86"
+                          x2="16.77"
+                          y2="14.86"
+                        ></line>
+                        <line
+                          fill="none"
+                          stroke="currentColor"
+                          strokeMiterlimit={10}
+                          x1="12"
+                          y1="10.09"
+                          x2="12"
+                          y2="19.64"
+                        ></line>
+                        <path
+                          fill="none"
+                          stroke="currentColor"
+                          strokeMiterlimit={10}
+                          d="M12,3.41,10.09,1.5H1.5V20.59A1.9,1.9,0,0,0,3.41,22.5H20.59a1.9,1.9,0,0,0,1.91-1.91V3.41Z"
+                        ></path>
+                        <line
+                          fill="none"
+                          stroke="currentColor"
+                          strokeMiterlimit={10}
+                          x1="1.5"
+                          y1="7.23"
+                          x2="22.5"
+                          y2="7.23"
+                        ></line>
+                      </svg>
+                    </span>
+                  </div>
+                ) : (
+                  <svg
+                    className="w-[2rem] duration-200 hover:opacity-90"
+                    id="Layer_1"
+                    data-name="Layer 1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
                   >
-                    {dataTMDB.variant}
-                    <svg
-                      className="w-[1.5rem]"
+                    <line
+                      fill="none"
                       stroke="currentColor"
-                      fill="currentColor"
-                      strokeWidth="0"
-                      viewBox="0 0 512 512"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M128 192l128 128 128-128z"></path>
-                    </svg>
-                  </span>
-                  <span
-                    className=" flex w-full items-center justify-center duration-300"
-                    style={{
-                      transform: dataTMDB.variant
-                        ? "translateY(100%)"
-                        : "translateY(calc(-100% + 0.75rem))",
-                    }}
-                  >
-                    <svg
-                      id="Layer_1"
-                      data-name="Layer 1"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      strokeWidth="1.5"
-                      className="w-[2rem] duration-200 hover:opacity-90"
-                    >
-                      <line
-                        fill="none"
-                        stroke="currentColor"
-                        strokeMiterlimit={10}
-                        x1="7.23"
-                        y1="14.86"
-                        x2="16.77"
-                        y2="14.86"
-                      ></line>
-                      <line
-                        fill="none"
-                        stroke="currentColor"
-                        strokeMiterlimit={10}
-                        x1="12"
-                        y1="10.09"
-                        x2="12"
-                        y2="19.64"
-                      ></line>
-                      <path
-                        fill="none"
-                        stroke="currentColor"
-                        strokeMiterlimit={10}
-                        d="M12,3.41,10.09,1.5H1.5V20.59A1.9,1.9,0,0,0,3.41,22.5H20.59a1.9,1.9,0,0,0,1.91-1.91V3.41Z"
-                      ></path>
-                      <line
-                        fill="none"
-                        stroke="currentColor"
-                        strokeMiterlimit={10}
-                        x1="1.5"
-                        y1="7.23"
-                        x2="22.5"
-                        y2="7.23"
-                      ></line>
-                    </svg>
-                  </span>
-                </div>
-                {/* <svg
-                  className="w-[2rem] duration-200 hover:opacity-90"
-                  id="Layer_1"
-                  data-name="Layer 1"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                >
-                  <line
-                    fill="none"
-                    stroke="currentColor"
-                    strokeMiterlimit={10}
-                    x1="7.23"
-                    y1="14.86"
-                    x2="16.77"
-                    y2="14.86"
-                  ></line>
-                  <line
-                    fill="none"
-                    stroke="currentColor"
-                    strokeMiterlimit={10}
-                    x1="12"
-                    y1="10.09"
-                    x2="12"
-                    y2="19.64"
-                  ></line>
-                  <path
-                    fill="none"
-                    stroke="currentColor"
-                    strokeMiterlimit={10}
-                    d="M12,3.41,10.09,1.5H1.5V20.59A1.9,1.9,0,0,0,3.41,22.5H20.59a1.9,1.9,0,0,0,1.91-1.91V3.41Z"
-                  ></path>
-                  <line
-                    fill="none"
-                    stroke="currentColor"
-                    strokeMiterlimit={10}
-                    x1="1.5"
-                    y1="7.23"
-                    x2="22.5"
-                    y2="7.23"
-                  ></line>
-                </svg> */}
+                      strokeMiterlimit={10}
+                      x1="7.23"
+                      y1="14.86"
+                      x2="16.77"
+                      y2="14.86"
+                    ></line>
+                    <line
+                      fill="none"
+                      stroke="currentColor"
+                      strokeMiterlimit={10}
+                      x1="12"
+                      y1="10.09"
+                      x2="12"
+                      y2="19.64"
+                    ></line>
+                    <path
+                      fill="none"
+                      stroke="currentColor"
+                      strokeMiterlimit={10}
+                      d="M12,3.41,10.09,1.5H1.5V20.59A1.9,1.9,0,0,0,3.41,22.5H20.59a1.9,1.9,0,0,0,1.91-1.91V3.41Z"
+                    ></path>
+                    <line
+                      fill="none"
+                      stroke="currentColor"
+                      strokeMiterlimit={10}
+                      x1="1.5"
+                      y1="7.23"
+                      x2="22.5"
+                      y2="7.23"
+                    ></line>
+                  </svg>
+                )}
                 <div
                   ref={dropdownRef}
                   className="absolute top-0 z-[2] w-full overflow-hidden rounded-md border-highlight-cyan bg-dark-300 text-lg text-light-100 shadow-lg duration-1000"

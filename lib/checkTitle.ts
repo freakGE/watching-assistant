@@ -1,5 +1,13 @@
+import { getSession } from "next-auth/react";
+
 const checkTitle = async (title: any, str?: "full") => {
   try {
+    const session = await getSession();
+    if (!session) {
+      // user is not authenticated
+      return null;
+    }
+
     // const url = process.env.NEXTAUTH_URL;
     const url = process.env.NEXT_PUBLIC_URL;
 
@@ -37,7 +45,7 @@ const checkTitle = async (title: any, str?: "full") => {
     return fixedData;
   } catch (err) {
     console.error(err);
-    return "An error occurred";
+    return null;
   }
 };
 export default checkTitle;

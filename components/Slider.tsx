@@ -16,7 +16,7 @@ import { useRouter } from "next/router";
 import { changeDB } from "@/lib/changeDB";
 import checkTitle from "@/lib/checkTitle";
 import { saveToDatabaseProps } from "@/lib/types";
-import { useSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 
 const Spinner = dynamic(() => import("./Spinner"));
 const LazyImage = dynamic(() => import("../components/LazyImage"), {
@@ -229,6 +229,11 @@ const Slider = ({
     const res: TrendingTypes = await fetchSliderData({ type, request, id });
 
     const updatedMovies = async () => {
+      const session = await getSession();
+
+      if (!session) {
+        return res.results;
+      }
       return await Promise.all(
         res.results.map(async movie => {
           const variant = await checkTitle(movie);
@@ -515,37 +520,85 @@ const Slider = ({
                                   : setDropdown(`${slide.id}`);
                               }}
                             >
-                              <div className="hidden h-full w-full flex-col items-center justify-center gap-y-[1rem] overflow-hidden duration-300 md:flex 2md:hidden xl:flex 2xl:hidden 5xl:flex">
-                                <span
-                                  className="flex w-full items-center justify-center duration-300 "
-                                  style={{
-                                    transform: slide.variant
-                                      ? dropdownId === slide.id
-                                        ? "translateY(calc(-100%))"
-                                        : "translateY(calc(100% - 0.25rem))"
-                                      : "translateY(calc(-100%))",
-                                  }}
-                                >
-                                  {slide.variant}
-                                  <svg
-                                    className="w-[1.5rem]"
-                                    stroke="currentColor"
-                                    fill="currentColor"
-                                    strokeWidth="0"
-                                    viewBox="0 0 512 512"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path d="M128 192l128 128 128-128z"></path>
-                                  </svg>
-                                </span>
-                                <span
-                                  className=" flex w-full items-center justify-center duration-300"
-                                  style={{
-                                    transform: slide.variant
-                                      ? "translateY(100%)"
-                                      : "translateY(calc(-100% + 0.25rem))",
-                                  }}
-                                >
+                              {slide.variant ? (
+                                <>
+                                  <div className="hidden h-full w-full flex-col items-center justify-center gap-y-[1rem] overflow-hidden duration-300 md:flex 2md:hidden xl:flex 2xl:hidden 5xl:flex">
+                                    <span
+                                      className="flex w-full items-center justify-center duration-300 "
+                                      style={{
+                                        transform: slide.variant
+                                          ? dropdownId === slide.id
+                                            ? "translateY(calc(-100%))"
+                                            : "translateY(calc(100% - 0.25rem))"
+                                          : "translateY(calc(-100%))",
+                                      }}
+                                    >
+                                      {slide.variant}
+                                      <svg
+                                        className="w-[1.5rem]"
+                                        stroke="currentColor"
+                                        fill="currentColor"
+                                        strokeWidth="0"
+                                        viewBox="0 0 512 512"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path d="M128 192l128 128 128-128z"></path>
+                                      </svg>
+                                    </span>
+                                    <span
+                                      className=" flex w-full items-center justify-center duration-300"
+                                      style={{
+                                        transform: slide.variant
+                                          ? "translateY(100%)"
+                                          : "translateY(calc(-100% + 0.25rem))",
+                                      }}
+                                    >
+                                      <svg
+                                        id="Layer_1"
+                                        data-name="Layer 1"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth="1.5"
+                                        width="24"
+                                        height="24"
+                                        className="duration-200 hover:opacity-90"
+                                      >
+                                        <line
+                                          fill="none"
+                                          stroke="currentColor"
+                                          strokeMiterlimit={10}
+                                          x1="7.23"
+                                          y1="14.86"
+                                          x2="16.77"
+                                          y2="14.86"
+                                        ></line>
+                                        <line
+                                          fill="none"
+                                          stroke="currentColor"
+                                          strokeMiterlimit={10}
+                                          x1="12"
+                                          y1="10.09"
+                                          x2="12"
+                                          y2="19.64"
+                                        ></line>
+                                        <path
+                                          fill="none"
+                                          stroke="currentColor"
+                                          strokeMiterlimit={10}
+                                          d="M12,3.41,10.09,1.5H1.5V20.59A1.9,1.9,0,0,0,3.41,22.5H20.59a1.9,1.9,0,0,0,1.91-1.91V3.41Z"
+                                        ></path>
+                                        <line
+                                          fill="none"
+                                          stroke="currentColor"
+                                          strokeMiterlimit={10}
+                                          x1="1.5"
+                                          y1="7.23"
+                                          x2="22.5"
+                                          y2="7.23"
+                                        ></line>
+                                      </svg>
+                                    </span>
+                                  </div>
                                   <svg
                                     id="Layer_1"
                                     data-name="Layer 1"
@@ -554,7 +607,7 @@ const Slider = ({
                                     strokeWidth="1.5"
                                     width="24"
                                     height="24"
-                                    className="duration-200 hover:opacity-90"
+                                    className="duration-200 hover:opacity-90 md:hidden 2md:block xl:hidden 2xl:block 5xl:hidden"
                                   >
                                     <line
                                       fill="none"
@@ -590,52 +643,53 @@ const Slider = ({
                                       y2="7.23"
                                     ></line>
                                   </svg>
-                                </span>
-                              </div>
-                              <svg
-                                id="Layer_1"
-                                data-name="Layer 1"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                strokeWidth="1.5"
-                                width="24"
-                                height="24"
-                                className="duration-200 hover:opacity-90 md:hidden 2md:block xl:hidden 2xl:block 5xl:hidden"
-                              >
-                                <line
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeMiterlimit={10}
-                                  x1="7.23"
-                                  y1="14.86"
-                                  x2="16.77"
-                                  y2="14.86"
-                                ></line>
-                                <line
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeMiterlimit={10}
-                                  x1="12"
-                                  y1="10.09"
-                                  x2="12"
-                                  y2="19.64"
-                                ></line>
-                                <path
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeMiterlimit={10}
-                                  d="M12,3.41,10.09,1.5H1.5V20.59A1.9,1.9,0,0,0,3.41,22.5H20.59a1.9,1.9,0,0,0,1.91-1.91V3.41Z"
-                                ></path>
-                                <line
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeMiterlimit={10}
-                                  x1="1.5"
-                                  y1="7.23"
-                                  x2="22.5"
-                                  y2="7.23"
-                                ></line>
-                              </svg>
+                                </>
+                              ) : (
+                                <svg
+                                  id="Layer_1"
+                                  data-name="Layer 1"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth="1.5"
+                                  width="24"
+                                  height="24"
+                                  className="duration-200 hover:opacity-90"
+                                >
+                                  <line
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeMiterlimit={10}
+                                    x1="7.23"
+                                    y1="14.86"
+                                    x2="16.77"
+                                    y2="14.86"
+                                  ></line>
+                                  <line
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeMiterlimit={10}
+                                    x1="12"
+                                    y1="10.09"
+                                    x2="12"
+                                    y2="19.64"
+                                  ></line>
+                                  <path
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeMiterlimit={10}
+                                    d="M12,3.41,10.09,1.5H1.5V20.59A1.9,1.9,0,0,0,3.41,22.5H20.59a1.9,1.9,0,0,0,1.91-1.91V3.41Z"
+                                  ></path>
+                                  <line
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeMiterlimit={10}
+                                    x1="1.5"
+                                    y1="7.23"
+                                    x2="22.5"
+                                    y2="7.23"
+                                  ></line>
+                                </svg>
+                              )}
                               <div
                                 ref={dropdownRef}
                                 className={`absolute bottom-0 z-[5] w-full overflow-hidden rounded-md border-highlight-cyan bg-dark-300 text-sm leading-tight text-light-100 shadow-lg duration-1000 md:text-base 2md:text-sm xl:text-base 2xl:text-xs 3xl:text-sm 5xl:text-sm
