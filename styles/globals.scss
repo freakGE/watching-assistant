@@ -1,0 +1,184 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+@layer base {
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"] {
+    -webkit-appearance: none;
+    margin: 0;
+    -moz-appearance: textfield !important;
+  }
+}
+
+* {
+  @apply m-0 box-border p-0;
+}
+
+// Scroll
+::-webkit-scrollbar {
+  @apply w-[0.3rem];
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  @apply hidden;
+}
+
+::-webkit-scrollbar-track {
+  margin-block: 0.5rem;
+  @apply rounded-full bg-dark-150 bg-opacity-0 duration-1000 hover:bg-opacity-75;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-dark-100 active:bg-opacity-80;
+}
+
+@supports (scrollbar-color: red black) {
+  * {
+    scrollbar-color: #979bb0 #25283a;
+    scrollbar-width: auto;
+  }
+}
+
+html,
+body {
+  @apply max-w-[100vw] overflow-x-hidden font-montserrat;
+}
+
+body {
+  @apply bg-dark-300 text-light-100;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+input:focus {
+  outline: none;
+}
+input:autofill {
+  background: transparent;
+}
+input:-webkit-autofill {
+  background: transparent;
+}
+textarea:focus {
+  outline: none;
+}
+textarea:autofill {
+  background: transparent;
+}
+textarea:-webkit-autofill {
+  background: transparent;
+}
+
+@keyframes scale-width {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.wrapper-container {
+  @apply flex w-screen justify-center;
+}
+.wrapper {
+  @apply w-11/12 max-w-[80rem] 2xs:w-10/12;
+}
+
+.box-orient {
+  -webkit-box-orient: vertical;
+  -moz-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+}
+
+.slick-slider {
+  @apply flex cursor-grab items-center justify-center active:cursor-grabbing;
+  .slick-list {
+    @apply flex flex-col items-center justify-center overflow-visible;
+    .slick-track {
+      @apply flex h-auto items-center justify-center overflow-visible;
+      .slick-slide {
+        @apply relative z-[1] mx-[1rem] h-[26rem] overflow-hidden rounded-md bg-red-200 duration-500 xs:mx-[1.5rem] sm:blur-[2px];
+      }
+      .slick-center {
+        box-shadow: 0px 0px 9px 7.5px hsla(255, 17%, 9%, 50%);
+        -webkit-box-shadow: 0px 0px 9px 7.5px hsla(255, 17%, 9%, 50%);
+        -moz-box-shadow: 0px 0px 9px 7.5px hsla(255, 17%, 9%, 50%);
+        @apply z-[2] scale-110 blur-none sm:scale-125;
+      }
+      [aria-hidden="true"] {
+        @apply blur-[2px] sm:blur-[4px];
+      }
+    }
+  }
+  .slick-dots {
+    @apply bottom-[-5rem] cursor-default;
+    button::before {
+      @apply hidden text-dark-150 opacity-100 duration-100 sm:block;
+    }
+    .slick-active {
+      button::before {
+        // text-highlight-cyan
+        @apply text-dark-100 opacity-100;
+      }
+    }
+  }
+}
+
+svg.tea {
+  #teabag {
+    transform-origin: top center;
+    transform: rotate(3deg);
+    animation: swing 2s infinite;
+  }
+  #steamL {
+    stroke-dasharray: 13;
+    stroke-dashoffset: 13;
+    animation: steamLarge 2s infinite;
+  }
+
+  #steamR {
+    stroke-dasharray: 9;
+    stroke-dashoffset: 9;
+    animation: steamSmall 2s infinite;
+  }
+}
+@keyframes swing {
+  50% {
+    transform: rotate(-3deg);
+  }
+}
+
+@keyframes steamLarge {
+  0% {
+    stroke-dashoffset: 13;
+    opacity: 0.6;
+  }
+  100% {
+    stroke-dashoffset: 39;
+    opacity: 0;
+  }
+}
+
+@keyframes steamSmall {
+  10% {
+    stroke-dashoffset: 9;
+    opacity: 0.6;
+  }
+  80% {
+    stroke-dashoffset: 27;
+    opacity: 0;
+  }
+  100% {
+    stroke-dashoffset: 27;
+    opacity: 0;
+  }
+}
