@@ -13,8 +13,7 @@ export const changeDB = async ({
     // const url = process.env.NEXTAUTH_URL;
     const url = process.env.NEXT_PUBLIC_URL;
     const response = await fetch(`${url}/api/update-db`, {
-      // method: "POST",
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },

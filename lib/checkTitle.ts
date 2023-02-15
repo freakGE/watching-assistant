@@ -18,8 +18,7 @@ const checkTitle = async (title: any, str?: "full") => {
     }
 
     const response = await fetch(`${url}/api/check-title`, {
-      // method: "POST",
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
