@@ -10,9 +10,11 @@ export const changeDB = async ({
 }: saveToDatabaseProps) => {
   try {
     if (!user) signIn();
-    const url = process.env.NEXTAUTH_URL;
+    // const url = process.env.NEXTAUTH_URL;
+    const url = process.env.NEXT_PUBLIC_URL;
     const response = await fetch(`${url}/api/update-db`, {
-      method: "POST",
+      // method: "POST",
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
@@ -28,6 +30,6 @@ export const changeDB = async ({
     return data;
   } catch (err) {
     console.error(err);
-    return err;
+    return "An error occurred";
   }
 };

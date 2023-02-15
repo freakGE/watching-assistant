@@ -18,7 +18,8 @@ const checkTitle = async (title: any, str?: "full") => {
     }
 
     const response = await fetch(`${url}/api/check-title`, {
-      method: "POST",
+      // method: "POST",
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
@@ -37,7 +38,7 @@ const checkTitle = async (title: any, str?: "full") => {
     return fixedData;
   } catch (err) {
     console.error(err);
-    return err;
+    return "An error occurred";
   }
 };
 export default checkTitle;
