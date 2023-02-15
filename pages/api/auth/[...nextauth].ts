@@ -86,15 +86,18 @@ const authOptions: NextAuthOptions = {
     async signIn({ user, account, profile, email, credentials }) {
       return true;
     },
-
     async session({ session, token, user }) {
       (session.user as { id: string | undefined }).id = token.sub;
       return session;
     },
+    async jwt({ token, user, account, profile, isNewUser }) {
+      return token;
+    },
   },
   secret: process.env.NEXTAUTH_SECRET,
   jwt: {
-    secret: process.env.JWT_SECRET,
+    // secret: process.env.JWT_SECRET,
+    maxAge: 60 * 60 * 24 * 30,
   },
   pages: {
     signIn: "/auth/signin",
