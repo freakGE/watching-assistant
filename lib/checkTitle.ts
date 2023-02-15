@@ -1,6 +1,8 @@
 const checkTitle = async (title: any, str?: "full") => {
   try {
-    const url = process.env.NEXTAUTH_URL;
+    // const url = process.env.NEXTAUTH_URL;
+    const url = process.env.NEXT_PUBLIC_URL;
+
     if (str === "full") {
       const response = await fetch(`${url}/api/get-db`, {
         method: "POST",
