@@ -84,6 +84,10 @@ const authOptions: NextAuthOptions = {
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
+  jwt: {
+    secret: process.env.JWT_SECRET,
+    maxAge: 60 * 60 * 24 * 30,
+  },
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
       return true;
@@ -93,8 +97,8 @@ const authOptions: NextAuthOptions = {
       // else if (new URL(url).origin === baseUrl) return url;
       // return baseUrl;
       //!
-      // return Promise.resolve(process.env.NEXTAUTH_URL);
-      return baseUrl;
+      // return baseUrl;
+      return process.env.NEXTAUTH_URL;
     },
     async session({ session, token, user }) {
       (session.user as { id: string | undefined }).id = token.sub;
@@ -111,7 +115,7 @@ const authOptions: NextAuthOptions = {
   //!
   // secret: process.env.NEXTAUTH_SECRET,
   // jwt: {
-  //   // secret: process.env.JWT_SECRET,
+  //   secret: process.env.JWT_SECRET,
   //   maxAge: 60 * 60 * 24 * 30,
   // },
   //!
