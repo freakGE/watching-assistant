@@ -83,13 +83,17 @@ const authOptions: NextAuthOptions = {
       clientSecret: process.env.GITHUB_SECRET,
     }),
   ],
+  secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
       return true;
     },
     async redirect({ url, baseUrl }) {
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
-      else if (new URL(url).origin === baseUrl) return url;
+      // if (url.startsWith("/")) return `${baseUrl}${url}`;
+      // else if (new URL(url).origin === baseUrl) return url;
+      // return baseUrl;
+      //!
+      // return Promise.resolve(process.env.NEXTAUTH_URL);
       return baseUrl;
     },
     async session({ session, token, user }) {
@@ -102,7 +106,7 @@ const authOptions: NextAuthOptions = {
   },
   // secret: process.env.JWT_SECRET,
   //!
-  secret: process.env.NEXTAUTH_SECRET,
+  // secret: process.env.NEXTAUTH_SECRET,
   // jwt: {
   //   // secret: process.env.JWT_SECRET,
   //   maxAge: 60 * 60 * 24 * 30,
