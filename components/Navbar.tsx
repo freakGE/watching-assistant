@@ -657,7 +657,11 @@ const Navbar = () => {
               }`}
             >
               <button
-                onClick={() => signOut()}
+                onClick={() =>
+                  signOut({
+                    callbackUrl: `${process.env.NEXT_PUBLIC_URL}`,
+                  })
+                }
                 className="rounded-md bg-highlight-pink p-2 font-semibold shadow-sm duration-300 hover:bg-opacity-90 active:bg-opacity-80 active:text-opacity-95"
               >
                 Sign Out

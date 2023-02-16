@@ -47,6 +47,7 @@ const SignIn: NextPage = (): JSX.Element => {
       email: userInfo.email,
       password: userInfo.password,
       // redirect: false,
+      callbackUrl: `${process.env.NEXT_PUBLIC_URL}`,
     });
 
     const email = validateEmail(userInfo.email);
@@ -174,7 +175,11 @@ const SignIn: NextPage = (): JSX.Element => {
           <button
             type="button"
             className="relative flex items-center justify-center rounded-md border border-dark-100 py-2 text-light-100 duration-300 hover:bg-dark-300  2exs:text-lg"
-            onClick={() => signIn("google")}
+            onClick={() =>
+              signIn("google", {
+                callbackUrl: `${process.env.NEXT_PUBLIC_URL}`,
+              })
+            }
           >
             <Image
               src={googleLogo}
@@ -186,7 +191,11 @@ const SignIn: NextPage = (): JSX.Element => {
           <button
             type="button"
             className="relative flex items-center justify-center rounded-md border border-dark-100 py-2 text-light-100 duration-300 hover:bg-dark-300  2exs:text-lg "
-            onClick={() => signIn("github")}
+            onClick={() =>
+              signIn("github", {
+                callbackUrl: `${process.env.NEXT_PUBLIC_URL}`,
+              })
+            }
           >
             <Image
               src={githubLogoWhite}
