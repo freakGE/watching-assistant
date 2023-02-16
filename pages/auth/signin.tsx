@@ -46,7 +46,7 @@ const SignIn: NextPage = (): JSX.Element => {
     const res = await signIn("credentials", {
       email: userInfo.email,
       password: userInfo.password,
-      // redirect: false,
+      redirect: false,
       callbackUrl: `${process.env.NEXT_PUBLIC_URL}`,
     });
 

@@ -101,6 +101,9 @@ const authOptions: NextAuthOptions = {
       return session;
     },
     async jwt({ token, user, account, profile, isNewUser }) {
+      if (user) {
+        token.id = user.id;
+      }
       return token;
     },
   },
