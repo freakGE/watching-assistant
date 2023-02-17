@@ -26,10 +26,13 @@ const authOptions: NextAuthOptions = {
         };
 
         const client = await clientPromise;
+        console.log(client);
 
         const users = await client
           .db(process.env.MONGODB_DB)
           .collection("users");
+
+        console.log(users);
 
         const result = await users.findOne({
           email,

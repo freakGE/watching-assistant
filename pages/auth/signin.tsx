@@ -70,8 +70,7 @@ const SignIn: NextPage = (): JSX.Element => {
       return;
 
     if (res && res.ok === false) {
-      // setInvalidCredintials(JSON.parse((res as any).error));
-      setInvalidCredintials((res as any).error);
+      setInvalidCredintials(JSON.parse((res as any).error));
     }
   };
 
