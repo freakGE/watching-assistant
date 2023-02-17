@@ -46,8 +46,8 @@ const SignIn: NextPage = (): JSX.Element => {
     const res = await signIn("credentials", {
       email: userInfo.email,
       password: userInfo.password,
-      redirect: false,
-      callbackUrl: `${process.env.NEXT_PUBLIC_URL}`,
+      // redirect: false,
+      // callbackUrl: `${process.env.NEXT_PUBLIC_URL}`,
     });
 
     const email = validateEmail(userInfo.email);
@@ -69,6 +69,7 @@ const SignIn: NextPage = (): JSX.Element => {
       return;
 
     if (res && res.ok === false) {
+      console.log(res);
       setInvalidCredintials(JSON.parse((res as any).error));
     }
   };
