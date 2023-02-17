@@ -47,10 +47,9 @@ const SignIn: NextPage = (): JSX.Element => {
       email: userInfo.email,
       password: userInfo.password,
       redirect: false,
-      callbackUrl: `${process.env.NEXT_PUBLIC_URL}`,
+      callbackUrl: process.env.NEXT_PUBLIC_URL,
     });
     console.log(res);
-    console.log(JSON.parse((res as any).error));
 
     const email = validateEmail(userInfo.email);
     const password = ValidatePassword(userInfo.password);
@@ -71,7 +70,8 @@ const SignIn: NextPage = (): JSX.Element => {
       return;
 
     if (res && res.ok === false) {
-      setInvalidCredintials(JSON.parse((res as any).error));
+      // setInvalidCredintials(JSON.parse((res as any).error));
+      setInvalidCredintials((res as any).error);
     }
   };
 
