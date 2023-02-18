@@ -55,7 +55,7 @@ const nameDetails = (props: any) => {
         <div className="wrapper mt-[1rem] flex h-full justify-center">
           <div className="flex h-full flex-col sm:flex-row sm:items-start sm:gap-x-[2rem]">
             <div className="flex w-full  flex-col items-center justify-center sm:w-[13rem] sm:items-start">
-              <div className="relative h-[17rem] w-[13rem]">
+              <div className="relative h-[15.5rem] w-[13rem] lg:h-[16rem] 2xl:h-[17rem]">
                 <Image
                   loading="lazy"
                   quality={100}

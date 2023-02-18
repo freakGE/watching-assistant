@@ -49,7 +49,6 @@ const SignIn: NextPage = (): JSX.Element => {
       redirect: false,
       callbackUrl: process.env.NEXT_PUBLIC_URL,
     });
-    console.log(res);
 
     const email = validateEmail(userInfo.email);
     const password = ValidatePassword(userInfo.password);

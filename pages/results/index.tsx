@@ -261,7 +261,7 @@ const SearchResults = (moviesData: { moviesData: SearchMultiTypes }) => {
                   >
                     <button
                       onClick={() => handleClick(movie)}
-                      className="relative h-[17rem] overflow-hidden rounded-t-md"
+                      className="relative h-[14rem] overflow-hidden rounded-t-md lg:h-[16rem] 2xl:h-[17rem]"
                     >
                       <LazyImage
                         src={`https://image.tmdb.org/t/p/w500` + img}

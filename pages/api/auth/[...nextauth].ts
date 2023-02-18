@@ -114,14 +114,7 @@ const authOptions: NextAuthOptions = {
       return token;
     },
   },
-  // secret: process.env.JWT_SECRET,
-  //!
-  // secret: process.env.NEXTAUTH_SECRET,
-  // jwt: {
-  //   secret: process.env.JWT_SECRET,
-  //   maxAge: 60 * 60 * 24 * 30,
-  // },
-  //!
+
   pages: {
     signIn: "/auth/signin",
     // signOut: "/auth/signout",
