@@ -1,4 +1,5 @@
 import "@/styles/globals.scss";
+import "reflect-metadata";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
 import dynamic from "next/dynamic";
