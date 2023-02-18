@@ -63,12 +63,6 @@ const authOptions: NextAuthOptions = {
           );
         }
 
-        console.table({
-          id: result._id.toString(),
-          email: result.email,
-          name: result.name,
-          password: result.password,
-        });
         return {
           id: result._id.toString(),
           email: result.email,
