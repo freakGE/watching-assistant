@@ -617,8 +617,9 @@ const SearchResults = (moviesData: { moviesData: SearchMultiTypes }) => {
           )}
         </div>
         <div
-          // mt-[0rem]
-          className="h-full w-full"
+          className={`h-full w-full ${
+            moviesData.moviesData.total_pages === 1 ? "mt-[3rem]" : "mt-0"
+          }`}
         >
           <Slider
             type={
