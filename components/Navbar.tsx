@@ -213,7 +213,7 @@ const Navbar = () => {
 
   return (
     <div
-      className={`wrapper-container fixed top-0 z-[10] flex h-[5rem] justify-center border-b bg-dark-300 py-5  duration-200 ${
+      className={`wrapper-container fixed top-0 z-[9999] flex h-[5rem] justify-center border-b bg-dark-300 py-5  duration-200 ${
         visibleBorder && "shadow-lg"
       }`}
       style={{
@@ -473,8 +473,8 @@ const Navbar = () => {
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
-            className="absolute top-[calc(2.5rem-1px)] w-screen cursor-grab select-none overflow-y-scroll scroll-smooth rounded-md rounded-t-none border-dark-100 bg-dark-200 duration-500 active:cursor-grabbing
-            xs:w-[83.5vw] sm:top-[3rem] sm:right-0 sm:w-[calc(100%-2.5rem)] sm:rounded-t-md sm:bg-dark-300"
+            className="absolute top-[calc(2.5rem-1px)] ml-[3.2rem] w-screen cursor-grab select-none overflow-y-scroll scroll-smooth rounded-md rounded-t-none border-dark-100 bg-dark-200 duration-500
+            active:cursor-grabbing xs:w-[83.5vw] sm:top-[3rem] sm:right-0 sm:ml-0 sm:w-[calc(100%-2.5rem)] sm:rounded-t-md sm:bg-dark-300"
             style={{
               height: movies && search ? "18rem" : 0,
               borderWidth: movies && search ? "1px" : 0,
