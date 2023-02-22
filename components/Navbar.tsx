@@ -213,7 +213,7 @@ const Navbar = () => {
 
   return (
     <div
-      className={`wrapper-container fixed top-0 z-[9999] flex h-[5rem] justify-center border-b bg-dark-300 py-5  duration-200 ${
+      className={`wrapper-container fixed top-0 z-[9998] flex h-[5rem] justify-center border-b bg-dark-300 py-5  duration-200 ${
         visibleBorder && "shadow-lg"
       }`}
       style={{

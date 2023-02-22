@@ -348,16 +348,13 @@ const Slider = ({
     >
       {/* //! preloader */}
       <span
-        className="duration-400 fixed top-0 z-[40] h-screen w-screen items-center justify-center bg-dark-300"
+        className="duration-400 fixed top-0 z-[9999] h-screen w-screen items-center justify-center bg-dark-300"
         style={{
           display: animationValue === 0 ? "flex" : "none",
         }}
       >
-        {/* <Spinner className="w-[3rem] animate-spin text-dark-100" /> */}
         <svg
           className="tea w-[4rem] sm:w-[5rem]"
-          // width="37"
-          // height="48"
           viewBox="0 0 37 48"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
