@@ -7,6 +7,8 @@ const NotFound = () => {
   const [animationValue, setAnimationValue] = useState(0);
   const [isFlashing, setIsFlashing] = useState(true);
 
+  const handleClick = () => router.push("/");
+
   const startAnimation = (index: number) => {
     let interval = setInterval(() => {
       index++;
@@ -92,7 +94,7 @@ const NotFound = () => {
           </span> */}
           <button
             className="absolute left-0 top-0 z-[5] rounded-full text-highlight-cyan duration-[250ms] hover:text-opacity-[85%] active:text-opacity-[95%] 3xs:hidden"
-            onClick={() => router.back()}
+            onClick={handleClick}
           >
             <svg
               className="h-[2.5rem] w-[2.5rem] rounded-full border-2 border-current"
@@ -111,7 +113,7 @@ const NotFound = () => {
               Oops!
               <button
                 className="absolute left-0 z-[5] hidden translate-x-[-111%] translate-y-[-11%] rounded-full text-highlight-cyan duration-[250ms] hover:text-opacity-[85%] active:text-opacity-[95%] 3xs:inline"
-                onClick={() => router.back()}
+                onClick={handleClick}
               >
                 <svg
                   className="h-[2.5rem] w-[2.5rem] rounded-full border-2 border-current"
