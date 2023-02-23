@@ -67,7 +67,7 @@ const Navbar = () => {
     e.preventDefault();
 
     if (search.length < 1) return;
-    const spaceRemoved = search.replace(/ /g, "+");
+    const spaceRemoved = search.trim().replace(/ /g, "+");
     const safeSearch = encodeURI(spaceRemoved);
     let safeType: string;
     switch (type) {
@@ -159,7 +159,8 @@ const Navbar = () => {
 
   useEffect(() => {
     const addMovies = async () => {
-      const searchData = await searchMovie(search);
+      const safeSearch = search.trim();
+      const searchData = await searchMovie(safeSearch);
 
       if (searchData.Response === "True") {
         startTransition(() => {
