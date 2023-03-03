@@ -26,13 +26,10 @@ const authOptions: NextAuthOptions = {
         };
 
         const client = await clientPromise;
-        console.log(client);
 
         const users = await client
           .db(process.env.MONGODB_DB)
           .collection("users");
-
-        console.log(users);
 
         const result = await users.findOne({
           email,
@@ -90,12 +87,9 @@ const authOptions: NextAuthOptions = {
       return true;
     },
     async redirect({ url, baseUrl }) {
-      // if (url.startsWith("/")) return `${baseUrl}${url}`;
-      // else if (new URL(url).origin === baseUrl) return url;
-      // return baseUrl;
-      //!
-      // return baseUrl;
-      return process.env.NEXTAUTH_URL;
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      else if (new URL(url).origin === baseUrl) return url;
+      return baseUrl;
     },
     async session({ session, token, user }) {
       (session.user as { id: string | undefined }).id = token.sub;

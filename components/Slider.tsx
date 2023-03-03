@@ -417,7 +417,11 @@ const Slider = ({
                     <Image
                       quality={100}
                       src={
-                        `https://image.tmdb.org/t/p/w500` + slide.backdrop_path
+                        slide.backdrop_path
+                          ? `https://image.tmdb.org/t/p/w500` +
+                            slide.backdrop_path
+                          : `https://image.tmdb.org/t/p/w500` +
+                            slide.poster_path
                       }
                       alt={
                         slide.title ||
@@ -439,8 +443,11 @@ const Slider = ({
                           >
                             <LazyImage
                               src={
-                                `https://image.tmdb.org/t/p/w500` +
                                 slide.poster_path
+                                  ? `https://image.tmdb.org/t/p/w500` +
+                                    slide.poster_path
+                                  : `https://image.tmdb.org/t/p/w500` +
+                                    slide.backdrop_path
                               }
                               alt={
                                 slide.title ||

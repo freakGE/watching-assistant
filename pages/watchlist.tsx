@@ -189,7 +189,7 @@ const Watchlist = () => {
       }
       setVariant(obj);
     });
-  }, [dropdownId, extraForm]);
+  }, [dropdownId, extraForm, status]);
 
   useEffect(() => {
     const cutLasso = 200;
