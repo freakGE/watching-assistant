@@ -651,7 +651,7 @@ const Navbar = () => {
             </button>
 
             <div
-              className={`absolute z-[-1] flex items-center justify-center overflow-hidden whitespace-nowrap  rounded-md text-sm text-light-100 duration-300 hover:bg-opacity-90 active:bg-opacity-80 active:text-opacity-95 sm:text-base ${
+              className={`absolute z-[-1] flex items-center justify-center overflow-hidden whitespace-nowrap  rounded-md text-sm text-light-100 duration-300 sm:text-base ${
                 options
                   ? "right-0 h-full translate-y-[125%] scale-100"
                   : "right-[-1.5rem] h-0 translate-y-[0%] scale-[25%]"
