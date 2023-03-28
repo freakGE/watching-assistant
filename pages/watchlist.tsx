@@ -343,7 +343,7 @@ const Watchlist = () => {
                       key={movie.id}
                       className={`flex w-full justify-center rounded-md shadow-lg`}
                       style={{
-                        zIndex: variant?.[currentVariant].length - i,
+                        zIndex: i,
                       }}
                     >
                       <div className="relative flex w-full max-w-[35rem] flex-col items-center rounded-md bg-dark-200 shadow-md duration-300 hover:shadow-xl md:flex-row lg:max-w-full">
