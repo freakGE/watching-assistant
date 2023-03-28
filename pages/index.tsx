@@ -235,7 +235,7 @@ export default function Home(moviesData: {
                   >
                     <button
                       onClick={() => handleClick(movie)}
-                      className="relative flex h-[14rem] lg:h-[16rem] 2xl:h-[17rem] items-center justify-center overflow-hidden rounded-t-md"
+                      className="relative flex h-[14rem] items-center justify-center overflow-hidden rounded-t-md lg:h-[16rem] 2xl:h-[17rem]"
                     >
                       <LazyImage
                         src={

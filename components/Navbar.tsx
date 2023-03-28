@@ -622,7 +622,7 @@ const Navbar = () => {
               <span
                 className={`
               absolute bottom-1.5 h-0.5  bg-highlight-cyan duration-300 sm:bottom-1
-              ${router.asPath === "/watchlist" ? "w-[100%]" : "w-[0%]"}
+              ${router.pathname === "/watchlist" ? "w-[100%]" : "w-[0%]"}
               `}
               />
             </Link>
@@ -636,6 +636,7 @@ const Navbar = () => {
             >
               {data?.user?.image ? (
                 <Image
+                  priority
                   unoptimized={true}
                   alt={
                     (data?.user?.name && data?.user?.name[0].toUpperCase()) ||
