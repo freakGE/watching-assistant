@@ -96,7 +96,7 @@ const ExtraModal = ({
 
   return (
     <div
-      className={`fixed top-0 left-0 z-[50] flex h-screen w-screen items-center justify-center duration-300
+      className={`fixed top-0 left-0 z-[9997] flex h-screen w-screen items-center justify-center duration-300
     ${isVisible ? "backdrop-blur-[2px]" : "backdrop-blur-[0px]"}
     `}
     >
