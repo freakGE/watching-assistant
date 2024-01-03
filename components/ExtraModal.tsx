@@ -2,6 +2,8 @@ import { changeDB } from "@/lib/changeDB";
 import { FormEventHandler, useEffect, useRef, useState } from "react";
 import { saveToDatabaseProps } from "@/lib/types";
 import { useSession } from "next-auth/react";
+import Swipeable from "./Swipeable";
+
 
 type ExtraModalProps = {
   title: any;
@@ -23,8 +25,8 @@ const ExtraModal = ({
 }: ExtraModalProps): JSX.Element => {
   const { status, data } = useSession();
   const formRef = useRef<HTMLFormElement>(null);
-  const seasonRef = useRef<HTMLInputElement>(null);
-  const episodeRef = useRef<HTMLInputElement>(null);
+  // const seasonRef = useRef<HTMLInputElement>(null);
+  // const episodeRef = useRef<HTMLInputElement>(null);
   const commentRef = useRef<HTMLTextAreaElement>(null);
   const urlRef = useRef<HTMLInputElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -37,9 +39,30 @@ const ExtraModal = ({
   const [invalidURL, setInvalidURL] = useState(false);
   const [URLErrorHover, setURLErrorHover] = useState(false);
 
+  const { modifiedTotalCount: episodeCount, swipeableElement: swipeableEpisode } = Swipeable({
+    totalCount: extraForm?.episode || 0,
+    onFocus: () => setFocusedInput("episode"),
+    onBlur: () => setFocusedInput(null)
+  });
+
+  const { modifiedTotalCount: seasonCount, swipeableElement: swipeableSeason } = Swipeable({
+    totalCount: extraForm?.season || 0,
+    onFocus: () => setFocusedInput("season"),
+    onBlur: () => setFocusedInput(null)
+  });
+
+
+  const isPositiveInteger = (number: number) => {
+    if (typeof number !== 'number' || isNaN(number) || number <= 0 || !Number.isInteger(number)) {
+      return undefined;
+    } else {
+      return number;
+    }
+  };
+
   const handleSubmit: FormEventHandler<HTMLFormElement> = async e => {
     e.preventDefault();
-
+ 
     if (extraForm?.url && extraForm.url.length > 0) {
       const validURL = isUrl(extraForm?.url || "");
 
@@ -91,6 +114,21 @@ const ExtraModal = ({
   }, [isVisible]);
 
   useEffect(() => {
+    setExtraForm({
+      ...extraForm,
+      episode: isPositiveInteger(episodeCount),
+    })
+  }, [episodeCount])
+
+  useEffect(() => {    
+ 
+    setExtraForm({
+      ...extraForm,
+      season: isPositiveInteger(seasonCount),
+    })
+  }, [seasonCount])
+
+  useEffect(() => {
     setIsVisible(true);
   }, []);
 
@@ -102,10 +140,8 @@ const ExtraModal = ({
     >
       <form
         ref={formRef}
-        className={`z-[1] flex h-auto max-h-[525px] w-11/12 max-w-[25rem]  flex-col justify-center rounded-md border border-dark-100 bg-dark-200 py-[4rem] px-[2.5rem] shadow-lg duration-500
-        ${isVisible ? "scale-100 opacity-100" : "scale-0 opacity-0"}
-        
-        `}
+        className={`z-[1] flex h-auto max-h-[525px] w-11/12 max-w-[25rem] flex-col justify-center rounded-md border border-dark-100 bg-dark-200 py-[4rem] px-[2.5rem] shadow-lg duration-500
+        ${isVisible ? "scale-100 opacity-100" : "scale-0 opacity-0"}`}
         onSubmit={handleSubmit}
       >
         <h1
@@ -122,53 +158,17 @@ const ExtraModal = ({
 
         {(title.type === "tv" || title.Type === "series") && (
           <div className="mb-5 flex h-full w-full items-center justify-center text-3xl">
-            <div className="flex items-center justify-center gap-x-[0.5rem]">
-              <label htmlFor="season" className="w-[0.6rem]">
+            <div className="flex items-center justify-center gap-x-[0.5rem] ">
+              <label htmlFor="season" className="w-[0.7rem]">
                 S
               </label>
-              <input
-                ref={seasonRef}
-                value={extraForm?.season}
-                onChange={({ target }) =>
-                  setExtraForm({ ...extraForm, season: parseInt(target.value) })
-                }
-                type="number"
-                name="season"
-                placeholder="0"
-                onFocus={() => {
-                  setFocusedInput("season");
-                }}
-                onBlur={() => {
-                  setFocusedInput(null);
-                }}
-                className="w-[2rem] border-b border-dark-100 bg-dark-200  text-center duration-200 focus:border-highlight-cyan"
-              />
+              {swipeableSeason}
             </div>
-            {/* <span className="mx-2 h-[2rem] w-[2px] rotate-12 bg-dark-100" /> */}
-            <div className="flex items-center justify-center gap-x-[0.5rem]">
-              <label htmlFor="episode" className="w-[0.6rem]">
+            <div className="flex items-center justify-center gap-x-[0.5rem] ">
+              <label htmlFor="episode" className="w-[0.7rem]">
                 E
               </label>
-              <input
-                ref={episodeRef}
-                value={extraForm?.episode}
-                placeholder="0"
-                onChange={({ target }) =>
-                  setExtraForm({
-                    ...extraForm,
-                    episode: parseInt(target.value),
-                  })
-                }
-                type="number"
-                name="episode"
-                onFocus={() => {
-                  setFocusedInput("episode");
-                }}
-                onBlur={() => {
-                  setFocusedInput(null);
-                }}
-                className="w-[2rem] border-b border-dark-100 bg-dark-200  text-center duration-200 focus:border-highlight-cyan"
-              />
+              {swipeableEpisode}
             </div>
           </div>
         )}

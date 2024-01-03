@@ -55,7 +55,7 @@ export default function Home(moviesData: {
             shallow: true,
           }
         )
-        .catch(e => {
+        .catch((e: { cancelled: any; }) => {
           if (!e.cancelled) {
             throw e;
           }
@@ -74,7 +74,7 @@ export default function Home(moviesData: {
             shallow: true,
           }
         )
-        .catch(e => {
+        .catch((e: { cancelled: any; }) => {
           if (!e.cancelled) {
             throw e;
           }
@@ -93,7 +93,7 @@ export default function Home(moviesData: {
             shallow: true,
           }
         )
-        .catch(e => {
+        .catch((e: { cancelled: any; }) => {
           if (!e.cancelled) {
             throw e;
           }

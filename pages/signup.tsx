@@ -20,7 +20,7 @@ type AccountType = {
 
 const createAccount = async ({ email, name, password }: AccountType) => {
   try {
-    const url = process.env.NEXTAUTH_URL;
+    const url = process.env.NEXT_PUBLIC_URL;
     const response = await fetch(`${url}/api/create-account`, {
       method: "POST",
       headers: {

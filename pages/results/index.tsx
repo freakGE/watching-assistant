@@ -64,7 +64,7 @@ const SearchResults = (moviesData: { moviesData: SearchMultiTypes }) => {
             shallow: true,
           }
         )
-        .catch(e => {
+        .catch((e: { cancelled: any; }) => {
           if (!e.cancelled) {
             throw e;
           }
@@ -83,7 +83,7 @@ const SearchResults = (moviesData: { moviesData: SearchMultiTypes }) => {
             shallow: true,
           }
         )
-        .catch(e => {
+        .catch((e: { cancelled: any; }) => {
           if (!e.cancelled) {
             throw e;
           }
@@ -102,7 +102,7 @@ const SearchResults = (moviesData: { moviesData: SearchMultiTypes }) => {
             shallow: true,
           }
         )
-        .catch(e => {
+        .catch((e: { cancelled: any; }) => {
           if (!e.cancelled) {
             throw e;
           }
