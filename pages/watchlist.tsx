@@ -1,6 +1,6 @@
 "use client";
 import Head from "next/head";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { saveToDatabaseProps } from "@/lib/types";
 import { changeDB } from "@/lib/changeDB";
@@ -53,13 +53,14 @@ const variantTranslator = (str: string) => {
 const Watchlist = () => {
   const { status, data } = useSession();
   const router = useRouter();
-  const variantsArray = [
+
+  const variantsArray = useMemo(() => [
     "watching",
     "on-hold",
     "to-watch",
     "dropped",
     "completed",
-  ];
+  ], []);
   const [currentVariant, setCurrentVariant] = useState<string>(
     variantsArray[0]
   );
@@ -121,7 +122,7 @@ const Watchlist = () => {
             shallow: true,
           }
         )
-        .catch(e => {
+        .catch((e: { cancelled: any; }) => {
           if (!e.cancelled) {
             throw e;
           }
@@ -140,7 +141,7 @@ const Watchlist = () => {
             shallow: true,
           }
         )
-        .catch(e => {
+        .catch((e: { cancelled: any; }) => {
           if (!e.cancelled) {
             throw e;
           }
@@ -159,7 +160,7 @@ const Watchlist = () => {
             shallow: true,
           }
         )
-        .catch(e => {
+        .catch((e: { cancelled: any; }) => {
           if (!e.cancelled) {
             throw e;
           }
