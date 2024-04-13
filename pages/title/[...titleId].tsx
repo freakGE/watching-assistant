@@ -91,6 +91,7 @@ const TitleDetail = (props: any) => {
       }
       const titleInfo = await checkTitle(props.data, "full");
       const variant = await checkTitle(props.data);
+
       if (titleInfo && titleInfo.extra) {
         return { ...props.data, variant, extra: titleInfo.extra };
       } else {
@@ -788,7 +789,21 @@ const TitleDetail = (props: any) => {
                     )}
                   </div>
                 </div>
+                
               </div>
+              {/* //! */}
+
+                {props.data.videoURL && <div className="flex w-full mt-5 sm:mt-0 sm:mb-5 relative overflow-hidden" style={{ paddingTop: "56.25%" }}>
+                  <iframe 
+                    className="absolute top-0 left-0 w-full h-full" 
+                    src={props.data.videoURL}
+                    frameBorder="0" 
+                    allowFullScreen
+                    allow="fullscreen"
+                    // referrerPolicy="strict-origin-when-cross-origin"
+                  />
+                </div>}
+              {/* //! */}
               {dataTMDB.variant && (
                 <button
                   className="
@@ -807,7 +822,7 @@ const TitleDetail = (props: any) => {
             <div className="hidden flex-col gap-y-2 xl:flex">
               {(dataTMDB.overview || dataTMDB.Plot) && (
                 <p className="text-[0.95rem] text-dark-100 sm:hidden">
-                  {dataTMDB.overview || dataTMDB.Plot}
+                  {dataTMDB.overview || dataTMDB.Plot}        
                 </p>
               )}
               {dataTMDB.type && (
@@ -1316,7 +1331,7 @@ export const getServerSideProps: GetServerSideProps<
         revalidate: 60 * 60 * 4,
       },
     });
-
+ 
     const data = await res.json();
 
     if (data.success === false || data.Response === "False") {
@@ -1342,13 +1357,107 @@ export const getServerSideProps: GetServerSideProps<
 
     let safeType = type && type[0];
     if (data && data.Type) {
-      if (data.Type === "movies") safeType = "movies";
+      if (data.Type === "movies" || data.Type === "movie") safeType = "movie";
       if (data.Type === "series") safeType = "tv";
     }
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    const getId = data.id || safeId || data.imdbID
+    
+    const titleVideosResponse = await fetch(
+      `https://api.themoviedb.org/3/${safeType}/${getId}/videos?api_key=${process.env.TMDB_API}&language=en-US&external_source=imdb_id`
+    );
+    const titleVideos = (await titleVideosResponse.json()).results || [];
+
+console.log(    `https://api.themoviedb.org/3/${safeType}/${getId}/videos?api_key=${process.env.TMDB_API}&language=en-US&external_source=imdb_id`)
+    const possibleTypes = ['Official Trailer','Trailer', 'Teaser', 'Featurette', 'Clip', 'Behind-the-scenes', 'Interview', 'Review', 'Promo', 'Bloopers', 'Deleted Scenes', 'Making Of', 'Fan Reactions', 'Music Video', 'Sneak Peek', 'Recap', 'Highlight Reel'];
+
+    /*
+    //? Gets single, "best" video.
+    const findBestVideo = (videos: any) => {
+      if (!videos || videos.length === 0) return undefined
+
+      if (videos[videos.length - 1].type.toLowerCase() === "trailer") 
+        return videos[videos.length - 1]
+
+      for (const type of possibleTypes) {
+        const video = videos.find((v: { type: string; }) => v.type.toLowerCase() === type.toLowerCase());
+        if (video) {
+            return video;
+        }
+    }
+      return videos ? videos[videos.length - 1] : undefined; 
+    };
+
+    const bestVideo = findBestVideos(titleVideos);
+
+    const bestVideoURL = bestVideo?.site === 'YouTube' && `https://www.youtube.com/embed/${bestVideo.key}?cc_load_policy=1`
+
+    */ 
+
+    /*
+    TODO:
+    * Check YT video availability. 
+    * Return first available video.
+    */
+
+    const findBestVideos = (videos: any[]) => {
+      if (!videos || videos.length === 0) return [];
+  
+      const sortedVideos: any[] = [];
+  
+      for (const type of possibleTypes) {
+          const matchingVideos = videos.filter((video: any) => {
+              return video.type.toLowerCase() === type.toLowerCase();
+          });
+          sortedVideos.push(...matchingVideos);
+  
+          // Remove matched videos from the original array
+          videos = videos.filter((video: any) => {
+              return !matchingVideos.includes(video);
+          });
+      }
+  
+      // Add any remaining videos to the end of the sorted array
+      sortedVideos.push(...videos);
+  
+      return sortedVideos;
+  };
+  
+    const getBestVideo = async (videos: any[]) => {
+      if (!videos || videos.length === 0) return null;
+  
+      const youtubeBaseUrl = 'https://www.youtube.com/embed/';
+      const youtubeParams = 'cc_load_policy=1'
+
+      //! Doesn't work as expected. 
+      const checkVideoAvailability = async (url: string) => {
+          try {
+              const response = await fetch(url, { method: 'HEAD' });
+              return response.ok;
+          } catch (error) {
+              return false;
+          }
+      };
+  
+      for (const video of videos) {
+          if (video.site !== "YouTube") return
+          const videoUrl = `${youtubeBaseUrl}${video.key}?${youtubeParams}`;
+          // Check if the video URL is working
+          if (await checkVideoAvailability(videoUrl)) {
+              return videoUrl;
+          }
+      }
+  
+      return null; // No working video found
+  };
+  
+  const bestVideoURL = await getBestVideo(findBestVideos(titleVideos));  
+  
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     return {
       props: {
-        data: { ...data, type: safeType, id: data.id || safeId || data.imdbID },
+        data: { ...data, type: safeType, id: getId, videoURL: bestVideoURL },
       },
     };
   } catch (e: any) {
