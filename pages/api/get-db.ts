@@ -15,6 +15,7 @@ export default async function handler(
   const userId = session && session.user && (session.user as any).id;
   const title = req.body.title;
   const full = req.query.full;
+  const short = req.query.short;
 
   const objectId = new ObjectId(userId);
   const user = await collection.findOne({ _id: objectId });
@@ -38,6 +39,30 @@ export default async function handler(
     "dropped",
     "completed",
   ];
+
+  const fixedVariant = (variant: string) => {
+    let fixedName;
+    if (variant === "watching") fixedName = "Watching";
+    if (variant === "on-hold") fixedName = "On-Hold";
+    if (variant === "to-watch") fixedName = "To Watch";
+    if (variant === "dropped") fixedName = "Dropped";
+    if (variant === "completed") fixedName = "Completed";
+    if (fixedName) return fixedName
+  }
+  if (short) {
+    const response = {} as any;
+    
+    for (const variant of variantsArray) {
+      if (!user[variant]) continue;
+
+      for (const item of user[variant]) {
+        response[item.id] = fixedVariant(variant);
+      }
+    }
+
+    return res.json(response);
+  }
+
 
   for (const variant of variantsArray) {
     if (!user[variant]) {
