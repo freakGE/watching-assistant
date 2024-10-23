@@ -158,6 +158,7 @@ const Navbar = () => {
   }, [dropdown, trackMouse, trackScroll]);
 
   useEffect(() => {
+    if (search.length < 1) return;
     const addMovies = async () => {
       const safeSearch = search.trim();
       const searchData = await searchMovie(safeSearch);
@@ -338,9 +339,15 @@ const Navbar = () => {
       <div className="flex w-11/12 max-w-[80rem] items-center justify-between md:w-10/12">
         <Link
           href={"/"}
-          scroll
-          shallow
+          // shallow
+          scroll={false}
+          prefetch={true}
           className="relative flex w-max items-end pl-[2.15rem] text-2xl font-bold"
+          onClick={() => {
+            setTimeout(() => {
+              window.scrollTo({ top: 0, behavior: 'smooth' }); 
+            }, 100);
+          }}
         >
           <Image
             priority
