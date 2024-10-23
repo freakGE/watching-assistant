@@ -30,20 +30,22 @@ export const fixVariant = (variant: string) => {
         return variant;
     }
   };
-  
+
+let globalVariantsCache: any = null; 
+
 export const updateMoviesWithVariants = async (
     moviesData: { results: any[] },
     setMovies: React.Dispatch<React.SetStateAction<any[]>>,
-    setVariants?: React.Dispatch<React.SetStateAction<any>>
   ) => {
     
     const cachedVariants = JSON.parse(localStorage.getItem('cachedVariants') || '{}');
     const currentTime = Date.now();
     
-    const variants = await fetchVariants(); 
-    if (setVariants) {
-      setVariants(variants);
+    if (!globalVariantsCache) {
+      globalVariantsCache = await fetchVariants(); 
     }
+  
+    const variants = globalVariantsCache;
   
     const allCached = moviesData.results.every(movie => {
       const cachedData = cachedVariants[movie.id];
@@ -61,7 +63,6 @@ export const updateMoviesWithVariants = async (
       });
       return;
     }
-
   
     const updatedMovies = await Promise.all(
       moviesData.results.map(async (movie) => {
