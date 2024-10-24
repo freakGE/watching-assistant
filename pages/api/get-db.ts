@@ -2,6 +2,7 @@ import clientPromise from "@/lib/mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { ObjectId } from "mongodb";
 import { getSession } from "next-auth/react";
+import { UserVariants } from "@/lib/types";
 
 export default async function handler(
   req: NextApiRequest,
@@ -28,17 +29,31 @@ export default async function handler(
     });
   }
 
-  if (full) {
-    return res.json(user);
-  }
-
-  const variantsArray = [
+  const variantsArray: Array<keyof UserVariants> = [
     "watching",
     "on-hold",
     "to-watch",
     "dropped",
     "completed",
   ];
+
+  if (full) {
+    const filterUser: UserVariants = {
+      watching: [],
+      "on-hold": [],
+      "to-watch": [],
+      dropped: [],
+      completed: [],
+    };
+
+    for (const variant of variantsArray) {
+      if (user[variant]) {
+        filterUser[variant] = user[variant];
+      }
+    }
+
+    return res.json(filterUser);
+  }
 
   const fixedVariant = (variant: string) => {
     let fixedName;
@@ -49,6 +64,7 @@ export default async function handler(
     if (variant === "completed") fixedName = "Completed";
     if (fixedName) return fixedName
   }
+  
   if (short) {
     const response = {} as any;
     
