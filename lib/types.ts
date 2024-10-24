@@ -146,3 +146,11 @@ export type saveToDatabaseProps = {
     url?: string;
   };
 };
+
+export type UserVariants = {
+  watching: any[]; 
+  "on-hold": any[];
+  "to-watch": any[];
+  dropped: any[];
+  completed: any[];
+}

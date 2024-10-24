@@ -132,8 +132,7 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    ((width && width >= 640) || focusedInput || visibleInput) ? setButtonType('submit') : setButtonType('button')
-     
+    ((width && width >= 640) || focusedInput || visibleInput) ? setButtonType('submit') : setButtonType('button');
   }, [width, focusedInput, visibleInput]);
   
   useEffect(() => {

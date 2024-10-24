@@ -1,6 +1,7 @@
-import { saveToDatabaseProps } from "@/lib/types";
-import { signIn } from "next-auth/react";
 import router from "next/router";
+import { signIn } from "next-auth/react";
+import { saveToDatabaseProps } from "@/lib/types";
+import { fixVariant } from "./getMovies";
 
 export const refreshData = () => {
   router.replace(router.asPath, undefined, { scroll: false });
@@ -15,7 +16,6 @@ export const changeDB = async ({
 }: saveToDatabaseProps) => {
   try {
     if (!user) signIn();
-    // const url = process.env.NEXTAUTH_URL;
     const url = process.env.NEXT_PUBLIC_URL;
     const response = await fetch(`${url}/api/update-db`, {
       method: "POST",
@@ -38,19 +38,19 @@ export const changeDB = async ({
   }
 };
 
-export const updateCache = (titleId: string, variant: saveToDatabaseProps["variant"]) => {
+export const updateCache = async (titleId: string, variant: saveToDatabaseProps["variant"]) => {
   let cachedVariants = JSON.parse(localStorage.getItem('cachedVariants') || '{}');
 
-
+  const fixedVariant = fixVariant(variant)
   cachedVariants[titleId] = {
-    variant,
+    variant: fixedVariant,
     timestamp: Date.now()
   };
 
   localStorage.setItem('cachedVariants', JSON.stringify(cachedVariants));
 };
 
-export const removeFromCache = (titleId: string) => {
+export const removeFromCache = async (titleId: string) => {
   let cachedVariants = JSON.parse(localStorage.getItem('cachedVariants') || '{}');
 
   if (cachedVariants[titleId]) {
@@ -59,19 +59,19 @@ export const removeFromCache = (titleId: string) => {
   }
 };
 
-export const addToDB = (
+export const addToDB = async (
   variant: saveToDatabaseProps["variant"],
   title: any,
   user: any,
   setDropdown: (value: any) => void,
 ) => {
-  changeDB({
+  await changeDB({
       variant,
       user,
       title,
   });
 
-  updateCache(title.id, variant);
+  await updateCache(title.id, variant);
 
   refreshData();
 
@@ -83,20 +83,20 @@ export const addToDB = (
   }, 750);
 };
 
-export const removeFromDB = (
+export const removeFromDB = async (
   variant: saveToDatabaseProps["variant"],
   title: any,
   user: any,
   setDropdown: (value: any) => void,
 ) => {
-  changeDB({
+  await changeDB({
       variant,
       user,
       title,
       remove: true,
   });
 
-  removeFromCache(title.id);
+  await removeFromCache(title.id);
 
   refreshData();
 

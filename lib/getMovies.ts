@@ -36,28 +36,36 @@ let globalVariantsCache: any = null;
 export const updateMoviesWithVariants = async (
     moviesData: { results: any[] },
     setMovies: React.Dispatch<React.SetStateAction<any[]>>,
-  ) => {
-    
+  ) => {    
+    // localStorage.clear()
     const cachedVariants = JSON.parse(localStorage.getItem('cachedVariants') || '{}');
     const currentTime = Date.now();
     
     if (!globalVariantsCache) {
-      globalVariantsCache = await fetchVariants(); 
+      globalVariantsCache = await fetchVariants();
+    } else {
+      const hasDifferentVariants = moviesData.results.some(movie => {
+        const cachedData = cachedVariants[movie.id];
+        const currentVariant = globalVariantsCache[movie.id];
+        return cachedData && (!currentVariant || cachedData.variant !== currentVariant);
+      });
+   
+      if (hasDifferentVariants) {
+        globalVariantsCache = cachedVariants || await fetchVariants();
+        // globalVariantsCache = await fetchVariants();
+      }
     }
-  
-    const variants = globalVariantsCache;
-  
+    
     const allCached = moviesData.results.every(movie => {
       const cachedData = cachedVariants[movie.id];
       return cachedData && (currentTime - cachedData.timestamp < 4 * 60 * 60 * 1000);
     });
-  
+    
     if (allCached) {
       const cachedMovies = moviesData.results.map(movie => ({
         ...movie,
         variant: fixVariant(cachedVariants[movie.id].variant),
       }));
-  
       startTransition(() => {
         setMovies(cachedMovies);
       });
@@ -70,16 +78,31 @@ export const updateMoviesWithVariants = async (
         if (cachedData && (currentTime - cachedData.timestamp < 4 * 60 * 60 * 1000)) {
           return { ...movie, variant: fixVariant(cachedData.variant) }; 
         }
-        const variant = variants[movie.id];
-  
+        const variant = globalVariantsCache[movie.id];
+        const fixedVariant = fixVariant(variant)
+        
         if (variant) {
           cachedVariants[movie.id] = {
-            variant,
+            variant: fixedVariant,
             timestamp: currentTime,
           };
-          localStorage.setItem('cachedVariants', JSON.stringify(cachedVariants));
-          const fixedVariant = fixVariant(variant)
-          return { ...movie, fixedVariant };
+          try {
+            localStorage.setItem('cachedVariants', JSON.stringify(cachedVariants));
+          } catch (e) {
+            if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+              // If storage is full, remove the oldest item
+              const sortedEntries = Object.entries(cachedVariants).sort(
+                ([, a], [, b]) => (a as any).timestamp - (b as any).timestamp
+              );
+          
+              const oldestEntryKey = sortedEntries[0][0];
+              delete cachedVariants[oldestEntryKey];
+          
+              localStorage.setItem('cachedVariants', JSON.stringify(cachedVariants));
+            } else {
+              console.error('Unknown error:', e);
+            }};
+          return { ...movie, variant: fixedVariant };
         }
         return movie;
       })
