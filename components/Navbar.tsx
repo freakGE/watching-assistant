@@ -62,7 +62,9 @@ const Navbar = () => {
   const [scrollUp, setScrollUp] = useState(true);
   const [visibleBorder, setVisibleBorder] = useState(false);
   const [options, setOptions] = useState(false);
+  const [buttonType, setButtonType] = useState<'button' | 'submit'>('button');
 
+  
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = e => {
     e.preventDefault();
 
@@ -129,6 +131,11 @@ const Navbar = () => {
     setIsDragging(false);
   };
 
+  useEffect(() => {
+    ((width && width >= 640) || focusedInput || visibleInput) ? setButtonType('submit') : setButtonType('button')
+     
+  }, [width, focusedInput, visibleInput]);
+  
   useEffect(() => {
     const cutLasso = 200;
 
@@ -341,7 +348,6 @@ const Navbar = () => {
           href={"/"}
           // shallow
           scroll={false}
-          prefetch={true}
           className="relative flex w-max items-end pl-[2.15rem] text-2xl font-bold"
           onClick={() => {
             setTimeout(() => {
@@ -565,11 +571,7 @@ const Navbar = () => {
           </button>
 
           <button
-            type={
-              (width && width >= 640) || focusedInput || visibleInput
-                ? "submit"
-                : "button"
-            }
+            type={buttonType}
             className={`absolute flex h-[42px] w-[2rem] cursor-pointer items-center justify-center rounded-md border-0 bg-dark-300 text-dark-100 duration-200 hover:bg-dark-150 hover:text-highlight-cyan sm:w-[2.5rem]
             sm:rounded-l-none sm:border 
             sm:border-l-0 sm:hover:bg-dark-300 ${

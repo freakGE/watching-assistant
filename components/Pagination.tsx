@@ -46,7 +46,6 @@ const Pagination = ({ totalPages = 500 }: PaginationProps): JSX.Element => {
               },
             }}
             scroll={false}
-            prefetch={true}
             onClick={e =>handleClick()}
             className={`${
               page <= 1 && "hidden"
@@ -73,7 +72,6 @@ const Pagination = ({ totalPages = 500 }: PaginationProps): JSX.Element => {
                 },
             }}
             scroll={false}
-            prefetch={true}
             onClick={e =>handleClick()}
             className={`${page - 2 <= 0 && "hidden"}
         h-[3rem] w-[3rem] rounded-full bg-dark-150 duration-300 hover:text-highlight-cyan flex justify-center items-center
@@ -90,7 +88,6 @@ const Pagination = ({ totalPages = 500 }: PaginationProps): JSX.Element => {
               },
             }}
             scroll={false}
-            prefetch={true}
             onClick={e =>handleClick()}
             className={`${page - 1 <= 0 && "hidden"}
         h-[3rem] w-[3rem] rounded-full bg-dark-150 duration-300 hover:text-highlight-cyan flex justify-center items-center
@@ -120,7 +117,6 @@ const Pagination = ({ totalPages = 500 }: PaginationProps): JSX.Element => {
               },
             }}
             scroll={false}
-            prefetch={true}
             onClick={e =>handleClick()}          
             className={`${
               totalPages && Number(page) - 1 + 2 > totalPages && "hidden"
@@ -139,7 +135,6 @@ const Pagination = ({ totalPages = 500 }: PaginationProps): JSX.Element => {
               },
             }}
             scroll={false}
-            prefetch={true}
             onClick={e =>handleClick()}           
             className={`${
               totalPages && Number(page) - 1 + 3 > totalPages && "hidden"
@@ -158,7 +153,6 @@ const Pagination = ({ totalPages = 500 }: PaginationProps): JSX.Element => {
               },
             }}
             scroll={false}
-            prefetch={true}
             onClick={e =>handleClick()}              
             className={`${
               totalPages && Number(page) - 1 + 2 >= totalPages && "hidden"
