@@ -2,8 +2,6 @@
 import Head from "next/head";
 import { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { saveToDatabaseProps } from "@/lib/types";
-import { changeDB } from "@/lib/changeDB";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -19,6 +17,11 @@ const ExtraModal = dynamic(() => import("@/components/ExtraModal"), {
     <Spinner className="z-[1] w-[3.5rem] animate-spin text-dark-100" />
   ),
 });
+
+import { movieDetails } from "@/lib/navigate";
+import { addToDB, removeFromDB } from "@/lib/changeDB";
+import { fixVariant } from "@/lib/getMovies";
+import { saveToDatabaseProps } from "@/lib/types";
 
 const fetchData = async () => {
   const response = await fetch(
@@ -110,99 +113,57 @@ const Watchlist = () => {
   }, [router.query.type, variantsArray]);
 
   const handleClick = async (title: any) => {
-    const id = `${title.type}`;
-    if (title.type === "person") {
-      router
-        .push(
-          {
-            pathname: `name/${title.id}`,
-          },
-          undefined,
-          {
-            shallow: true,
-          }
-        )
-        .catch((e: { cancelled: any; }) => {
-          if (!e.cancelled) {
-            throw e;
-          }
-        });
-      return;
-    }
-    if (title.type === "movie") {
-      router
-        .push(
-          {
-            pathname: `title/${id}`,
-            query: { i: title.id },
-          },
-          undefined,
-          {
-            shallow: true,
-          }
-        )
-        .catch((e: { cancelled: any; }) => {
-          if (!e.cancelled) {
-            throw e;
-          }
-        });
-      return;
-    }
-    if (title.type === "tv") {
-      router
-        .push(
-          {
-            pathname: `title/${id}`,
-            query: { i: title.id },
-          },
-          undefined,
-          {
-            shallow: true,
-          }
-        )
-        .catch((e: { cancelled: any; }) => {
-          if (!e.cancelled) {
-            throw e;
-          }
-        });
-      return;
-    }
+    movieDetails(title);
   };
 
   const handleAdd = (variant: saveToDatabaseProps["variant"], title: any) => {
-    changeDB({
-      variant,
-      user: data?.user,
-      title,
+    addToDB(variant, title, data?.user, setDropdown)
+
+    setVariant((prevVariant) => {
+      const fixedVariant = fixVariant(variant);
+      const newTitle = { ...title, variant: fixedVariant };
+    
+      const updatedVariant = prevVariant ? { ...prevVariant } : {};
+      
+      const currentVariant = variantTranslator(title.variant)!
+      const removedCurrentVariant = updatedVariant[currentVariant].filter((item) => item.id !== title.id);
+
+      updatedVariant[currentVariant] = removedCurrentVariant
+
+
+      if (updatedVariant[variant]) {
+        const existingTitles = updatedVariant[variant];
+        const titleExists = existingTitles.some((item) => item.title === newTitle.title);
+
+        if (titleExists) {
+          return updatedVariant;
+        }
+      } else {
+        updatedVariant[variant] = [];
+      }
+  
+      updatedVariant[variant].push(newTitle);
+  
+      return updatedVariant as { [key: string]: { id: number; title: string; type: "movie" | "tv"; }[] } | null;
     });
-
-    setDropdown(null);
-
-    setTimeout(() => {
-      setDropdownId(title.id);
-      setTimeout(() => setDropdownId(null), 1000);
-    }, 750);
   };
 
   const handleRemove = (
     variant: saveToDatabaseProps["variant"],
     title: any
   ) => {
-    changeDB({
-      variant,
-      user: data?.user,
-      title,
-      remove: true,
-    });
+    removeFromDB(variant, title, data?.user, setDropdown)
 
-    setDropdown(null);
+    setVariant((prevVariant) => {
+      const updatedVariant = prevVariant ? { ...prevVariant } : {};
+      const currentVariant = variantTranslator(title.variant)!
+      const removedCurrentVariant = updatedVariant[currentVariant].filter((item) => item.id !== title.id);
+      updatedVariant[currentVariant] = removedCurrentVariant
 
-    setTimeout(() => {
-      setDropdownId(title.id);
-      setTimeout(() => setDropdownId(null), 1000);
-    }, 750);
+      return updatedVariant as { [key: string]: { id: number; title: string; type: "movie" | "tv"; }[] } | null;
+    })
   };
-
+  
   useEffect(() => {
     if (status === "loading") return;
     fetchData().then(res => {
@@ -425,7 +386,6 @@ const Watchlist = () => {
                                   )}
                                   {movie.extra.comment && (
                                     <div className="flex flex-row flex-wrap gap-x-1">
-                                      {/* <h3 className="font-semibold">Comment:</h3> */}
                                       <p className="box-orient max-h-[3rem] overflow-hidden text-ellipsis text-dark-100">
                                         → {movie.extra.comment}
                                       </p>

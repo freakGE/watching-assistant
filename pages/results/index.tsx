@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect, useState, useRef, useTransition } from "react";
+import { useEffect, useState, useRef } from "react";
 import { GetServerSideProps } from "next";
 import {
   saveToDatabaseProps,
@@ -12,9 +12,8 @@ import {
 } from "@/lib/types";
 import dynamic from "next/dynamic";
 import useWindowDimensions from "@/components/WindowDimensions";
-import checkTitle from "@/lib/checkTitle";
-import { changeDB } from "@/lib/changeDB";
-import { getSession, useSession } from "next-auth/react";
+import { addToDB, removeFromDB } from "@/lib/changeDB";
+import { useSession } from "next-auth/react";
 import { useAppState } from "@/components/AppState";
 const Spinner = dynamic(() => import("@/components/Spinner"));
 const LazyImage = dynamic(() => import("@/components/LazyImage"), {
@@ -24,6 +23,8 @@ const LazyImage = dynamic(() => import("@/components/LazyImage"), {
 });
 
 import Slider from "@/components/Slider";
+import { updateMoviesWithVariants } from "@/lib/getMovies";
+import { movieDetails } from "@/lib/navigate";
 
 const Pagination = dynamic(() => import("@/components/Pagination"), {
   loading: () => (
@@ -31,8 +32,8 @@ const Pagination = dynamic(() => import("@/components/Pagination"), {
   ),
 });
 
-const SearchResults = (moviesData: { moviesData: SearchMultiTypes }) => {
-  const { status, data } = useSession();
+const SearchResults = ({ moviesData, search, type, page }: { moviesData: SearchMultiTypes, search: string, type: string, page: number }) => {
+  const { data } = useSession();
   const { width } = useWindowDimensions();
   const router = useRouter();
   const querySearch = router.query.search;
@@ -47,131 +48,23 @@ const SearchResults = (moviesData: { moviesData: SearchMultiTypes }) => {
   const [trackScroll, setTrackScroll] = useState<number | null>(null);
   const queryType = router.query.type;
   const queryId = router.query.i;
-  const [isPending, startTransition] = useTransition();
   const [dropdownId, setDropdownId] = useState(null);
 
   const handleClick = async (title: any) => {
-    const id = queryType || title.media_type;
-
-    if (id === "person") {
-      router
-        .push(
-          {
-            pathname: `name/${title.id}`,
-          },
-          undefined,
-          {
-            shallow: true,
-          }
-        )
-        .catch((e: { cancelled: any; }) => {
-          if (!e.cancelled) {
-            throw e;
-          }
-        });
-      return;
-    }
-    if (id === "movie") {
-      router
-        .push(
-          {
-            pathname: `title/${id}`,
-            query: { i: title.id },
-          },
-          undefined,
-          {
-            shallow: true,
-          }
-        )
-        .catch((e: { cancelled: any; }) => {
-          if (!e.cancelled) {
-            throw e;
-          }
-        });
-      return;
-    }
-    if (id === "tv") {
-      router
-        .push(
-          {
-            pathname: `title/${id}`,
-            query: { i: title.id },
-          },
-          undefined,
-          {
-            shallow: true,
-          }
-        )
-        .catch((e: { cancelled: any; }) => {
-          if (!e.cancelled) {
-            throw e;
-          }
-        });
-      return;
-    }
+    const resolvedQueryType = typeof queryType === 'string' ? queryType : undefined;
+    movieDetails(title, resolvedQueryType);
   };
-
-  const refreshData = () => {
-    router.replace(router.asPath, undefined, { scroll: false });
-  };
-
+  
   const handleAdd = (variant: saveToDatabaseProps["variant"], title: any) => {
-    changeDB({
-      variant,
-      user: data?.user,
-      title,
-    });
-    refreshData();
-
-    setDropdown(null);
-
-    // setDropdownId(null);
-    setTimeout(() => {
-      setDropdownId(title.id);
-      setTimeout(() => setDropdownId(null), 1000);
-    }, 750);
-  };
-
-  const handleRemove = (
-    variant: saveToDatabaseProps["variant"],
-    title: any
-  ) => {
-    changeDB({
-      variant,
-      user: data?.user,
-      title,
-      remove: true,
-    });
-    refreshData();
-
-    setDropdown(null);
-
-    setTimeout(() => {
-      setDropdownId(title.id);
-      setTimeout(() => setDropdownId(null), 1000);
-    }, 750);
-  };
+    addToDB(variant, title, data?.user, setDropdown)
+  }
+  const handleRemove = (variant: saveToDatabaseProps["variant"], title: any) => {
+    removeFromDB(variant, title, data?.user, setDropdown)
+  }
 
   useEffect(() => {
-    if (!moviesData.moviesData.results) return;
-
-    const updatedMovies = async () => {
-      const session = await getSession();
-
-      if (!session) {
-        return moviesData.moviesData.results;
-      }
-      return await Promise.all(
-        moviesData.moviesData.results.map(async movie => {
-          const variant = await checkTitle(movie);
-          return { ...movie, variant };
-        })
-      );
-    };
-    updatedMovies().then(value => {
-      startTransition(() => setMovies(value));
-    });
-  }, [dropdownId, moviesData.moviesData.results, status]);
+    updateMoviesWithVariants(moviesData, setMovies);
+  }, [moviesData, search, type, page]);
 
   useEffect(() => {
     const cutLasso = 200;
@@ -605,20 +498,19 @@ const SearchResults = (moviesData: { moviesData: SearchMultiTypes }) => {
                             )}
                           </div>
                         </div>
-                        {/* //! */}
                       </div>
                     </div>
                   </div>
                 );
               })}
           </div>
-          {moviesData.moviesData.total_pages && (
-            <Pagination totalPages={moviesData.moviesData.total_pages} />
+          {moviesData.total_pages && (
+            <Pagination totalPages={moviesData.total_pages} />
           )}
         </div>
         <div
           className={`h-full w-full ${
-            moviesData.moviesData.total_pages === 1 ? "mt-[3rem]" : "mt-0"
+            moviesData.total_pages === 1 ? "mt-[3rem]" : "mt-0"
           }`}
         >
           <Slider
@@ -662,6 +554,7 @@ export const getServerSideProps: GetServerSideProps<
     return {
       props: {
         moviesData,
+        search, type, page
       },
     };
   } catch (e) {

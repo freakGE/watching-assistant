@@ -1,168 +1,60 @@
 /* eslint-disable @next/next/no-img-element */
 import Head from "next/head";
-import { getSession, useSession } from "next-auth/react";
-import { useEffect, useState, useRef, useTransition } from "react";
-import useWindowDimensions from "@/components/WindowDimensions";
-import { GetServerSideProps } from "next";
-import { MoviesType, MoviesPopularType } from "@/lib/types";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
-import { changeDB } from "@/lib/changeDB";
-import checkTitle from "@/lib/checkTitle";
-import { saveToDatabaseProps } from "@/lib/types";
+import { useSession } from "next-auth/react";
+import { useEffect, useState, useRef } from "react";
+import { GetServerSideProps } from "next";
 const Spinner = dynamic(() => import("@/components/Spinner"));
 const LazyImage = dynamic(() => import("../components/LazyImage"), {
   loading: () => (
     <Spinner className="z-[1] w-[3.5rem] animate-spin text-dark-100" />
   ),
 });
-
-import Slider from "@/components/Slider";
 const Pagination = dynamic(() => import("@/components/Pagination"), {
   loading: () => (
     <Spinner className="z-[1] w-[3.5rem] animate-spin text-dark-100" />
   ),
 });
+const Slider = dynamic(() => import("@/components/Slider"), {
+  loading: () => (
+    <Spinner className="z-[1] w-[3.5rem] animate-spin text-dark-100" />
+  ),
+});
 
-export default function Home(moviesData: {
-  moviesData: MoviesType["popular"];
-}) {
+import { MoviesType, MoviesPopularType } from "@/lib/types";
+import { addToDB, removeFromDB } from "@/lib/changeDB";
+import { saveToDatabaseProps } from "@/lib/types";
+import useWindowDimensions from "@/components/WindowDimensions";
+import { updateMoviesWithVariants } from "@/lib/getMovies";
+import { movieDetails } from "@/lib/navigate";
+
+export default function Home({ moviesData, type, page }: { moviesData: MoviesType["popular"], type: "popular" | "trending", page: number }) {
   const { width } = useWindowDimensions();
-  const { status, data } = useSession();
+  const { data } = useSession();
 
   const [movies, setMovies] = useState<MoviesPopularType[]>([]);
-  const router = useRouter();
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [dropdown, setDropdown] = useState<string | null>(null);
   const [trackMouse, setTrackMouse] = useState<[number, number]>([0, 0]);
   const [trackScroll, setTrackScroll] = useState<number | null>(null);
 
-  const [isPending, startTransition] = useTransition();
-
   const [dropdownId, setDropdownId] = useState(null);
 
   const handleClick = async (title: any) => {
-    const id = `${title.media_type}`;
-    if (title.media_type === "person") {
-      router
-        .push(
-          {
-            pathname: `name/${title.id}`,
-          },
-          undefined,
-          {
-            shallow: true,
-          }
-        )
-        .catch((e: { cancelled: any; }) => {
-          if (!e.cancelled) {
-            throw e;
-          }
-        });
-      return;
-    }
-    if (title.media_type === "movie") {
-      router
-        .push(
-          {
-            pathname: `title/${id}`,
-            query: { i: title.id },
-          },
-          undefined,
-          {
-            shallow: true,
-          }
-        )
-        .catch((e: { cancelled: any; }) => {
-          if (!e.cancelled) {
-            throw e;
-          }
-        });
-      return;
-    }
-    if (title.media_type === "tv") {
-      router
-        .push(
-          {
-            pathname: `title/${id}`,
-            query: { i: title.id },
-          },
-          undefined,
-          {
-            shallow: true,
-          }
-        )
-        .catch((e: { cancelled: any; }) => {
-          if (!e.cancelled) {
-            throw e;
-          }
-        });
-      return;
-    }
+    movieDetails(title);
   };
-
-  const refreshData = () => {
-    router.replace(router.asPath, undefined, { scroll: false });
-  };
-
+  
   const handleAdd = (variant: saveToDatabaseProps["variant"], title: any) => {
-    changeDB({
-      variant,
-      user: data?.user,
-      title,
-    });
-
-    refreshData();
-
-    setDropdown(null);
-
-    setTimeout(() => {
-      setDropdownId(title.id);
-      setTimeout(() => setDropdownId(null), 1000);
-    }, 750);
-  };
-
-  const handleRemove = (
-    variant: saveToDatabaseProps["variant"],
-    title: any
-  ) => {
-    changeDB({
-      variant,
-      user: data?.user,
-      title,
-      remove: true,
-    });
-    refreshData();
-
-    setDropdown(null);
-
-    setTimeout(() => {
-      setDropdownId(title.id);
-      setTimeout(() => setDropdownId(null), 1000);
-    }, 750);
-  };
+    addToDB(variant, title, data?.user, setDropdown)
+  }
+  const handleRemove = (variant: saveToDatabaseProps["variant"], title: any) => {
+    removeFromDB(variant, title, data?.user, setDropdown)
+  }
 
   useEffect(() => {
-    const updatedMovies = async () => {
-      const session = await getSession();
-
-      if (!session) {
-        return moviesData.moviesData.results;
-      }
-      return await Promise.all(
-        moviesData.moviesData.results.map(async movie => {
-          const variant = await checkTitle(movie);
-          return { ...movie, variant };
-        })
-      );
-    };
-    updatedMovies().then(value => {
-      startTransition(() => {
-        setMovies(value);
-      });
-    });
-  }, [dropdownId, moviesData.moviesData.results, status]);
+    updateMoviesWithVariants(moviesData, setMovies);
+  }, [moviesData, type, page]);
 
   useEffect(() => {
     const cutLasso = 200;
@@ -580,7 +472,7 @@ export default function Home(moviesData: {
                 );
               })}
           </div>
-          <Pagination totalPages={moviesData.moviesData.total_pages} />
+          <Pagination totalPages={moviesData.total_pages} />
         </div>
       </main>
     </>
@@ -607,8 +499,9 @@ export const getServerSideProps: GetServerSideProps<
         ? 1000
         : context.query.page || 1;
 
-    // const url = `https://api.themoviedb.org/3/movie/popular?api_key=${process.env.TMDB_API}&language=en-US&page=${page}`;
-    const url = `https://api.themoviedb.org/3/trending/all/week?api_key=${process.env.TMDB_API}&language=en-US&page=${page}`;
+
+    const type: "popular" | "trending" = "trending"
+    const url = `https://api.themoviedb.org/3/${type}/all/week?api_key=${process.env.TMDB_API}&language=en-US&page=${page}`;
     const res = await fetch(url, {
       next: {
         revalidate: 60 * 60 * 4,
@@ -619,7 +512,7 @@ export const getServerSideProps: GetServerSideProps<
 
     return {
       props: {
-        moviesData,
+        moviesData, type, page
       },
     };
   } catch (e) {

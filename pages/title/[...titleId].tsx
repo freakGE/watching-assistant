@@ -1,31 +1,30 @@
 import { GetServerSideProps } from "next";
-import { saveToDatabaseProps, TitleType } from "@/lib/types";
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import { useEffect, useRef, useState, useTransition } from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { getSession, useSession } from "next-auth/react";
-import checkTitle from "@/lib/checkTitle";
-import { changeDB } from "@/lib/changeDB";
+import Link from "next/link";
 
 const Spinner = dynamic(() => import("@/components/Spinner"), {
   loading: () => <div>Loading...</div>,
 });
-
-// const Slider = dynamic(() => import("@/components/Slider"), {
-//   loading: () => (
-//     <Spinner className="z-[1] w-[3.5rem] animate-spin text-dark-100" />
-//   ),
-// });
-import Slider from "@/components/Slider";
-import Link from "next/link";
-
+const Slider = dynamic(() => import("@/components/Slider"), {
+  loading: () => (
+    <Spinner className="z-[1] w-[3.5rem] animate-spin text-dark-100" />
+  ),
+});
 const ExtraModal = dynamic(() => import("@/components/ExtraModal"), {
   loading: () => (
     <Spinner className="z-[1] w-[3.5rem] animate-spin text-dark-100" />
   ),
 });
+
+import checkTitle from "@/lib/checkTitle";
+import { saveToDatabaseProps, TitleType } from "@/lib/types";
+import { getSession, useSession } from "next-auth/react";
+import { addToDB, removeFromDB } from "@/lib/changeDB";
+import { fixVariant } from "@/lib/getMovies";
 
 function convertToReadableDate(dateStr: string): string {
   const date = new Date(dateStr);
@@ -34,14 +33,11 @@ function convertToReadableDate(dateStr: string): string {
 
 const TitleDetail = (props: any) => {
   const { query } = useRouter();
-
   const { status, data } = useSession();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [dropdown, setDropdown] = useState(false);
   const [trackMouse, setTrackMouse] = useState<[number, number]>([0, 0]);
   const [trackScroll, setTrackScroll] = useState<number | null>(null);
-  // const dataTMDB = props.dataTMDB;
-  // const dataTMDB = props.data;
   const queryType = query.titleId && query.titleId[0];
   const [dataTMDB, setDataTMDB] = useState<any>([]);
   const [dropdownId, setDropdownId] = useState(null);
@@ -49,62 +45,38 @@ const TitleDetail = (props: any) => {
   const [extraForm, setExtraForm] = useState(false);
 
   const handleAdd = (variant: saveToDatabaseProps["variant"], title: any) => {
-    changeDB({
-      variant,
-      user: data?.user,
-      title,
-    });
-
-    setDropdown(false);
-
-    setTimeout(() => {
-      setDropdownId(title.id);
-      setTimeout(() => setDropdownId(null), 1000);
-    }, 750);
+    addToDB(variant, title, data?.user, setDropdown)
   };
 
   const handleRemove = (
     variant: saveToDatabaseProps["variant"],
     title: any
   ) => {
-    changeDB({
-      variant,
-      user: data?.user,
-      title,
-      remove: true,
-    });
-    // refreshData();
-    setDropdown(false);
-
-    setTimeout(() => {
-      setDropdownId(title.id);
-      setTimeout(() => setDropdownId(null), 1000);
-    }, 750);
+    removeFromDB(variant, title, data?.user, setDropdown)
   };
 
   useEffect(() => {
     const updatedMovies = async () => {
       const session = await getSession();
-
-      if (!session) {
-        return props.data;
-      }
-      const titleInfo = await checkTitle(props.data, "full");
-      const variant = await checkTitle(props.data);
-
-      if (titleInfo && titleInfo.extra) {
-        return { ...props.data, variant, extra: titleInfo.extra };
-      } else {
-        return { ...props.data, variant };
-      }
+      
+      if (!session) return props.data;
+      
+      const [titleInfo, cachedVariants] = await Promise.all([
+        checkTitle(props.data, "full"),
+        JSON.parse(localStorage.getItem('cachedVariants') || '{}'),
+      ]);
+      
+      const variant = typeof query.i === 'string' && query.i in cachedVariants ? fixVariant(cachedVariants[query.i].variant) : null;
+      
+      const updatedData = { ...props.data, variant, ...(titleInfo?.extra ? { extra: titleInfo.extra } : null) };
+      
+      return updatedData;
     };
-    updatedMovies().then(value => {
-      startTransition(() => {
-        setDataTMDB(value);
-      });
-    });
-  }, [dropdownId, extraForm, query, status]);
 
+    updatedMovies().then(value => startTransition(() => setDataTMDB(value)));
+  }, [dropdownId, extraForm, query, status, props.data]);
+
+  
   useEffect(() => {
     const cutLasso = 200;
 
@@ -791,8 +763,6 @@ const TitleDetail = (props: any) => {
                 </div>
                 
               </div>
-              {/* //! */}
-
                 {props.data.videoURL && <div className="flex w-full mt-5 sm:mt-0 sm:mb-5 relative overflow-hidden" style={{ paddingTop: "56.25%" }}>
                   <iframe 
                     className="absolute top-0 left-0 w-full h-full" 
@@ -803,7 +773,6 @@ const TitleDetail = (props: any) => {
                     // referrerPolicy="strict-origin-when-cross-origin"
                   />
                 </div>}
-              {/* //! */}
               {dataTMDB.variant && (
                 <button
                   className="
@@ -1360,7 +1329,7 @@ export const getServerSideProps: GetServerSideProps<
       if (data.Type === "movies" || data.Type === "movie") safeType = "movie";
       if (data.Type === "series") safeType = "tv";
     }
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
     const getId = data.id || safeId || data.imdbID
     
     const titleVideosResponse = await fetch(
@@ -1368,7 +1337,6 @@ export const getServerSideProps: GetServerSideProps<
     );
     const titleVideos = (await titleVideosResponse.json()).results || [];
 
-console.log(    `https://api.themoviedb.org/3/${safeType}/${getId}/videos?api_key=${process.env.TMDB_API}&language=en-US&external_source=imdb_id`)
     const possibleTypes = ['Official Trailer','Trailer', 'Teaser', 'Featurette', 'Clip', 'Behind-the-scenes', 'Interview', 'Review', 'Promo', 'Bloopers', 'Deleted Scenes', 'Making Of', 'Fan Reactions', 'Music Video', 'Sneak Peek', 'Recap', 'Highlight Reel'];
 
     /*
@@ -1391,7 +1359,6 @@ console.log(    `https://api.themoviedb.org/3/${safeType}/${getId}/videos?api_ke
     const bestVideo = findBestVideos(titleVideos);
 
     const bestVideoURL = bestVideo?.site === 'YouTube' && `https://www.youtube.com/embed/${bestVideo.key}?cc_load_policy=1`
-
     */ 
 
     /*
@@ -1451,10 +1418,8 @@ console.log(    `https://api.themoviedb.org/3/${safeType}/${getId}/videos?api_ke
       return null; // No working video found
   };
   
-  const bestVideoURL = await getBestVideo(findBestVideos(titleVideos));  
+    const bestVideoURL = await getBestVideo(findBestVideos(titleVideos));  
   
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
     return {
       props: {
         data: { ...data, type: safeType, id: getId, videoURL: bestVideoURL },
