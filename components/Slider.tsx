@@ -1,34 +1,32 @@
-import { TrendingTypes } from "@/lib/types";
 import Image from "next/image";
 import React, {
   Suspense,
   useEffect,
   useRef,
   useState,
-  useTransition,
 } from "react";
-import Paragraph from "./Paragraph";
 import SliderContainer from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import dynamic from "next/dynamic";
+import {  useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { changeDB } from "@/lib/changeDB";
-import checkTitle from "@/lib/checkTitle";
-import { saveToDatabaseProps } from "@/lib/types";
-import { getSession, useSession } from "next-auth/react";
 
+const Paragraph = dynamic(() => import("./Paragraph"));
 const Spinner = dynamic(() => import("./Spinner"));
-const LazyImage = dynamic(() => import("../components/LazyImage"), {
-  loading: () => (
-    <Spinner className="z-[1] w-[3.5rem] animate-spin text-dark-100" />
-  ),
-});
+const LazyImage = dynamic(() => import("../components/LazyImage"));
+
+import { addToDB, removeFromDB } from "@/lib/changeDB";
+import { saveToDatabaseProps } from "@/lib/types";
+import { updateMoviesWithVariants } from "@/lib/getMovies";
+import { TrendingTypes } from "@/lib/types";
+import { movieDetails } from "@/lib/navigate";
 
 type SliderProps = {
   top?: boolean;
   type?: "tv" | "movie" | "person" | "all";
   request?: "similar" | "trending";
+  variants?: {[id:number]: string};
   id?: string | number;
 };
 
@@ -174,8 +172,6 @@ const Slider = ({
   const router = useRouter();
   const queryType =
     router.query.type || (router.query.titleId && router.query.titleId[0]);
-  // const [sliderData, setSliderData] = useState<TrendingTypes | null>(null);
-  const [isPending, startTransition] = useTransition();
   const sliderRef = React.createRef<SliderContainer>();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [dropdown, setDropdown] = useState<string | null>(null);
@@ -184,134 +180,53 @@ const Slider = ({
   const [movies, setMovies] = useState<TrendingTypes["results"]>([]);
   const [dropdownId, setDropdownId] = useState(null);
   const [animationValue, setAnimationValue] = useState(0);
+  const [sliderData, setSliderData] = useState<TrendingTypes | null>(null);
+  const prevValues = useRef<{
+    type: "tv" | "movie" | "person" | "all" | null, 
+    request: "similar" | "trending" | null, 
+    id: string | number | null | undefined}>({ type: null, request: null, id: null });
 
-  const refreshData = () => {
-    router.replace(router.asPath, undefined, { scroll: false });
+  const handleClick = async (title: any) => {
+    // const resolvedQueryType = typeof queryType === 'string' ? queryType : undefined;
+    // movieDetails(title, resolvedQueryType);
+    movieDetails(title, queryType, true);
   };
 
   const handleAdd = (variant: saveToDatabaseProps["variant"], title: any) => {
-    changeDB({
-      variant,
-      user: data?.user,
-      title,
-    });
-    refreshData();
+    addToDB(variant, title, data?.user, setDropdown)
+  }
+  const handleRemove = (variant: saveToDatabaseProps["variant"], title: any) => {
+    removeFromDB(variant, title, data?.user, setDropdown)
+  }
 
-    setDropdown(null);
-
-    setTimeout(() => {
-      setDropdownId(title.id);
-      setTimeout(() => setDropdownId(null), 1000);
-    }, 750);
-  };
-
-  const handleRemove = (
-    variant: saveToDatabaseProps["variant"],
-    title: any
-  ) => {
-    changeDB({
-      variant,
-      user: data?.user,
-      title,
-      remove: true,
-    });
-    refreshData();
-
-    setDropdown(null);
-
-    setTimeout(() => {
-      setDropdownId(title.id);
-      setTimeout(() => setDropdownId(null), 1000);
-    }, 750);
-  };
-
-  const fetchData = async () => {
-    const res: TrendingTypes = await fetchSliderData({ type, request, id });
-
-    const updatedMovies = async () => {
-      const session = await getSession();
-
-      if (!session) {
-        return res.results;
-      }
-      return await Promise.all(
-        res.results.map(async movie => {
-          const variant = await checkTitle(movie);
-          return { ...movie, variant };
-        })
-      );
-    };
-    updatedMovies().then(value => {
-      startTransition(() => {
-        setMovies(value);
-      });
-    });
+  
+  
+  const fetchSlider = async () => {
+    const newSliderData = await fetchSliderData({ type, request, id });
+    if (JSON.stringify(newSliderData) !== JSON.stringify(sliderData)) setSliderData(newSliderData); 
   };
 
   useEffect(() => {
-    fetchData();
-  }, [dropdownId, router.query, status]);
+    if (
+      prevValues.current?.type !== type ||
+      prevValues.current?.request !== request ||
+      prevValues.current?.id !== id
+    ) {
+      fetchSlider();
 
-  const handleClick = async (title: any) => {
-    const type = title.media_type || queryType;
+      prevValues.current = { type, request, id };
+    }
+  }, [type, request, id]);
+  
+  useEffect(() => {
+    const updateMovies = async () => {
+      if (sliderData) {
+        await updateMoviesWithVariants(sliderData, setMovies);
+      }
+    };
 
-    if (type === "person") {
-      router
-        .replace(
-          {
-            pathname: `/name/${title.id}`,
-          },
-          undefined,
-          {
-            shallow: true,
-          }
-        )
-        .catch(e => {
-          if (!e.cancelled) {
-            throw e;
-          }
-        });
-      return;
-    }
-    if (type === "movie") {
-      router
-        .replace(
-          {
-            pathname: `/title/${type}`,
-            query: { i: title.id },
-          },
-          undefined,
-          {
-            shallow: !true,
-          }
-        )
-        .catch(e => {
-          if (!e.cancelled) {
-            throw e;
-          }
-        });
-      return;
-    }
-    if (type === "tv") {
-      router
-        .replace(
-          {
-            pathname: `/title/${type}`,
-            query: { i: title.id },
-          },
-          undefined,
-          {
-            shallow: !true,
-          }
-        )
-        .catch(e => {
-          if (!e.cancelled) {
-            throw e;
-          }
-        });
-      return;
-    }
-  };
+    updateMovies();
+  }, [dropdownId, router.query, status, sliderData]); 
 
   useEffect(() => {
     const cutLasso = 200;
@@ -343,58 +258,11 @@ const Slider = ({
 
   return (
     <div
-      className={`h-[26rem] w-screen text-dark-300 
-      ${top ? `my-[1rem] sm:my-[3.5rem]` : `mb-[3rem]`}`}
+      className={`h-[26rem] w-screen text-dark-300 relative
+      ${top ? `my-[1rem] sm:my-[3.5rem]` : `mb-[3rem]`}
+      `}
     >
-      {/* //! preloader */}
-      <span
-        className="duration-400 fixed top-0 z-[9999] h-screen w-screen items-center justify-center bg-dark-300"
-        style={{
-          display: animationValue === 0 ? "flex" : "none",
-        }}
-      >
-        <svg
-          className="tea w-[4rem] sm:w-[5rem]"
-          viewBox="0 0 37 48"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            stroke="rgb(151 155 176)"
-            strokeWidth={2}
-            d="M27.0819 17H3.02508C1.91076 17 1.01376 17.9059 1.0485 19.0197C1.15761 22.5177 1.49703 29.7374 2.5 34C4.07125 40.6778 7.18553 44.8868 8.44856 46.3845C8.79051 46.79 9.29799 47 9.82843 47H20.0218C20.639 47 21.2193 46.7159 21.5659 46.2052C22.6765 44.5687 25.2312 40.4282 27.5 34C28.9757 29.8188 29.084 22.4043 29.0441 18.9156C29.0319 17.8436 28.1539 17 27.0819 17Z"
-          />
-          <path
-            stroke="rgb(151 155 176)"
-            strokeWidth={2}
-            d="M29 23.5C29 23.5 34.5 20.5 35.5 25.4999C36.0986 28.4926 34.2033 31.5383 32 32.8713C29.4555 34.4108 28 34 28 34"
-          />
-          <path
-            id="teabag"
-            fill="rgb(151 155 176)"
-            fillRule="evenodd"
-            clipRule="evenodd"
-            d="M16 25V17H14V25H12C10.3431 25 9 26.3431 9 28V34C9 35.6569 10.3431 37 12 37H18C19.6569 37 21 35.6569 21 34V28C21 26.3431 19.6569 25 18 25H16ZM11 28C11 27.4477 11.4477 27 12 27H18C18.5523 27 19 27.4477 19 28V34C19 34.5523 18.5523 35 18 35H12C11.4477 35 11 34.5523 11 34V28Z"
-          />
-          <path
-            id="steamL"
-            d="M17 1C17 1 17 4.5 14 6.5C11 8.5 11 12 11 12"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            stroke="rgb(151 155 176)"
-          />
-          <path
-            id="steamR"
-            d="M21 6C21 6 21 8.22727 19 9.5C17 10.7727 17 13 17 13"
-            stroke="rgb(151 155 176)"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </span>
-      <div className="relative h-[26rem]">
+      <div className="relative h-[26rem] duration-300">
         <Suspense
           fallback={
             <Spinner className="z-[1] w-[3.5rem] animate-spin text-dark-100" />
@@ -405,6 +273,48 @@ const Slider = ({
             {...sliderSettings}
             className="h-full"
           >
+            {
+            animationValue === 0 && 
+            Array.from({ length: 20 }, (_, index) => (
+              <div 
+                key={index} 
+                className="relative flex h-[26rem] w-full max-w-[80rem] 2xs:w-10/12 items-center bg-dark-150 rounded"
+              >
+                {/* // Preload start */}
+                <div className="absolute z-[2] flex h-full w-full items-center justify-center animate-pulse">
+                      <div className="flex h-2/3 w-3/4 text-light-100">
+                        <div 
+                        className="hidden h-full w-[15rem] 2md:flex lg:hidden 2xl:flex bg-dark-100 rounded-md object-cover justify-center items-center">
+                          <svg className="w-10 h-10 text-dark-150" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 20">
+                              <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2ZM10.5 6a1.5 1.5 0 1 1 0 2.999A1.5 1.5 0 0 1 10.5 6Zm2.221 10.515a1 1 0 0 1-.858.485h-8a1 1 0 0 1-.9-1.43L5.6 10.039a.978.978 0 0 1 .936-.57 1 1 0 0 1 .9.632l1.181 2.981.541-1a.945.945 0 0 1 .883-.522 1 1 0 0 1 .879.529l1.832 3.438a1 1 0 0 1-.031.988Z"/>
+                              <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z"/>
+                          </svg>
+                        </div>
+                        
+                        <div className="ml-0 pt-1.5 pl-1.5 flex w-full flex-col 2md:ml-[0.5rem] lg:ml-0 2xl:ml-[0.5rem] justify-between">
+                          <div className="w-full">
+                            <div className="h-4 bg-dark-100 rounded-full w-2/5 mb-2.5"></div>
+                            <div className="h-4 bg-dark-100 rounded-full w-1/3 mb-2.5"></div>
+                            
+                            <div className="h-3 bg-dark-100 rounded-full w-full mb-1.5"></div>
+                            <div className="h-3 bg-dark-100 rounded-full w-11/12 mb-1.5"></div>
+                            <div className="h-3 bg-dark-100 rounded-full w-[95%] mb-1.5"></div>
+                            <div className="h-3 bg-dark-100 rounded-full w-10/12 mb-1.5"></div>
+                            <div className="h-3 bg-dark-100 rounded-full w-2/5 mb-2.5"></div>
+                          </div>
+
+                          <div className="h-10 w-full gap-x-3 flex flex-row justify-start">
+                            <div className="h-full bg-dark-100 rounded-md w-full py-2"></div>
+                            <div className="h-full bg-dark-100 rounded-md w-full py-2"></div>
+                          </div>
+                        </div>
+                    
+                      </div>
+                    </div>
+                {/* // Preload end */}
+              </div>
+            ))}
+        
             {movies &&
               movies.map(slide => {
                 const date = slide?.release_date || slide?.first_air_date;
@@ -412,10 +322,11 @@ const Slider = ({
                 return (
                   <div
                     key={slide.id}
-                    className="relative flex h-[26rem] w-full max-w-[80rem] items-center overflow-hidden bg-dark-300 2xs:w-10/12"
+                    className="relative flex h-[26rem] w-full max-w-[80rem] 2xs:w-10/12 items-center overflow-hidden bg-dark-300"
                   >
                     <Image
-                      quality={100}
+                      priority
+                      quality={10}
                       src={
                         slide.backdrop_path
                           ? `https://image.tmdb.org/t/p/w500` +
@@ -423,6 +334,7 @@ const Slider = ({
                           : `https://image.tmdb.org/t/p/w500` +
                             slide.poster_path
                       }
+                      width={0}
                       alt={
                         slide.title ||
                         slide.original_title ||
@@ -431,7 +343,7 @@ const Slider = ({
                       }
                       fill
                       unoptimized={true}
-                      className="z-[0] h-full w-full object-cover opacity-80 blur-[2px]"
+                      className="z-[0] object-cover opacity-80 blur-[2px]"
                     />
                     <span className="absolute h-full w-full bg-dark-300 bg-opacity-50" />
                     <div className="absolute z-[1] flex h-full w-full items-center justify-center">
@@ -455,7 +367,9 @@ const Slider = ({
                                 slide.name ||
                                 "Poster"
                               }
+                              slider
                               onImageLoad={() => setAnimationValue(1)}
+                              // onImageLoad={() => setTimeout(() => setAnimationValue(1), 100)}
                               unoptimized={true}
                               className="z-[1] h-full rounded-md object-cover duration-300"
                             />
@@ -703,7 +617,6 @@ const Slider = ({
                                     : "w-full"
                                 }
                                 `}
-                                // md:flex 2md:hidden xl:flex 2xl:hidden 5xl:flex
                                 style={{
                                   borderWidth:
                                     dropdown === `${slide.id}`
