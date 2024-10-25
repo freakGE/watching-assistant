@@ -9,9 +9,6 @@ module.exports = {
     "./app/**/*.{js,ts,jsx,tsx}",
     "./pages/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}",
-
-    // Or if using `src` directory:
-    "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
@@ -58,6 +55,13 @@ module.exports = {
         "4xl": "1792px",
         "5xl": "1853px",
         ...defaultTheme.screens,
+      },
+    },
+    keyframes: {
+      shimmer: {
+        '100%': {
+          transform: 'translateX(100%)',
+        },
       },
     },
   },

@@ -59,104 +59,6 @@ const fetchSliderData = async ({ type, request, id }: SliderProps) => {
   return data;
 };
 
-const sliderSettings = {
-  className: "center",
-  centerMode: true,
-  infinite: true,
-  dots: true,
-  centerPadding: "60px",
-  slidesToShow: 3,
-  speed: 500,
-  autoplaySpeed: 3500,
-  autoplay: true,
-  pauseOnHover: true,
-  focusOnSelect: true,
-  draggable: true,
-  arrows: false,
-  responsive: [
-    {
-      breakpoint: 1024,
-      settings: {
-        centerPadding: "175px",
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        centerMode: true,
-        swipe: true,
-      },
-    },
-    {
-      breakpoint: 600,
-      settings: {
-        centerPadding: "125px",
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        centerMode: true,
-        swipe: true,
-      },
-    },
-    {
-      breakpoint: 520,
-      settings: {
-        centerPadding: "100px",
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        centerMode: true,
-        swipe: true,
-      },
-    },
-    {
-      breakpoint: 475,
-      settings: {
-        centerPadding: "75px",
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        centerMode: true,
-        swipe: true,
-      },
-    },
-    {
-      breakpoint: 425,
-      settings: {
-        centerPadding: "60px",
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        centerMode: true,
-        swipe: true,
-      },
-    },
-    {
-      breakpoint: 380,
-      settings: {
-        centerPadding: "40px",
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        centerMode: true,
-        swipe: true,
-      },
-    },
-    {
-      breakpoint: 340,
-      settings: {
-        centerPadding: "30px",
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        centerMode: true,
-        swipe: true,
-      },
-    },
-    {
-      breakpoint: 320,
-      settings: {
-        centerPadding: "25px",
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        centerMode: true,
-        swipe: true,
-      },
-    },
-  ],
-};
-
 function convertToReadableDate(dateStr: string): string {
   const date = new Date(dateStr);
   return date.toLocaleDateString("en-US", { dateStyle: "medium" });
@@ -186,6 +88,104 @@ const Slider = ({
     request: "similar" | "trending" | null, 
     id: string | number | null | undefined}>({ type: null, request: null, id: null });
 
+  const sliderSettings = {
+      className: "center",
+      centerMode: true,
+      infinite: true,
+      dots: animationValue !== 0,
+      centerPadding: "60px",
+      slidesToShow: 3,
+      speed: 500,
+      autoplaySpeed: 3500,
+      autoplay: true,
+      pauseOnHover: true,
+      focusOnSelect: true,
+      draggable: true,
+      arrows: false,
+      responsive: [
+        {
+          breakpoint: 1024,
+          settings: {
+            centerPadding: "175px",
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            centerMode: true,
+            swipe: true,
+          },
+        },
+        {
+          breakpoint: 600,
+          settings: {
+            centerPadding: "125px",
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            centerMode: true,
+            swipe: true,
+          },
+        },
+        {
+          breakpoint: 520,
+          settings: {
+            centerPadding: "100px",
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            centerMode: true,
+            swipe: true,
+          },
+        },
+        {
+          breakpoint: 475,
+          settings: {
+            centerPadding: "75px",
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            centerMode: true,
+            swipe: true,
+          },
+        },
+        {
+          breakpoint: 425,
+          settings: {
+            centerPadding: "60px",
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            centerMode: true,
+            swipe: true,
+          },
+        },
+        {
+          breakpoint: 380,
+          settings: {
+            centerPadding: "40px",
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            centerMode: true,
+            swipe: true,
+          },
+        },
+        {
+          breakpoint: 340,
+          settings: {
+            centerPadding: "30px",
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            centerMode: true,
+            swipe: true,
+          },
+        },
+        {
+          breakpoint: 320,
+          settings: {
+            centerPadding: "25px",
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            centerMode: true,
+            swipe: true,
+          },
+        },
+      ],
+  };
+
   const handleClick = async (title: any) => {
     // const resolvedQueryType = typeof queryType === 'string' ? queryType : undefined;
     // movieDetails(title, resolvedQueryType);
@@ -199,8 +199,6 @@ const Slider = ({
     removeFromDB(variant, title, data?.user, setDropdown)
   }
 
-  
-  
   const fetchSlider = async () => {
     const newSliderData = await fetchSliderData({ type, request, id });
     if (JSON.stringify(newSliderData) !== JSON.stringify(sliderData)) setSliderData(newSliderData); 
@@ -278,14 +276,16 @@ const Slider = ({
             Array.from({ length: 20 }, (_, index) => (
               <div 
                 key={index} 
-                className="relative flex h-[26rem] w-full max-w-[80rem] 2xs:w-10/12 items-center bg-dark-150 rounded"
+                className="flex h-[26rem] w-full max-w-[80rem] 2xs:w-10/12 items-center bg-dark-200 rounded-lg"
               >
                 {/* // Preload start */}
-                <div className="absolute z-[2] flex h-full w-full items-center justify-center animate-pulse">
+                <div 
+                className="flex h-full w-full items-center justify-center relative overflow-hidden bg-dark-200 p-4 shadow-xl shadow-dark-300/5 before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:via-dark-100/10 before:to-transparent"
+                >
                       <div className="flex h-2/3 w-3/4 text-light-100">
                         <div 
-                        className="hidden h-full w-[15rem] 2md:flex lg:hidden 2xl:flex bg-dark-100 rounded-md object-cover justify-center items-center">
-                          <svg className="w-10 h-10 text-dark-150" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 20">
+                        className="hidden h-full w-[15rem] 2md:flex lg:hidden 2xl:flex bg-dark-150 rounded-md object-cover justify-center items-center">
+                          <svg className="w-10 h-10 text-dark-200" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 20">
                               <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2ZM10.5 6a1.5 1.5 0 1 1 0 2.999A1.5 1.5 0 0 1 10.5 6Zm2.221 10.515a1 1 0 0 1-.858.485h-8a1 1 0 0 1-.9-1.43L5.6 10.039a.978.978 0 0 1 .936-.57 1 1 0 0 1 .9.632l1.181 2.981.541-1a.945.945 0 0 1 .883-.522 1 1 0 0 1 .879.529l1.832 3.438a1 1 0 0 1-.031.988Z"/>
                               <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z"/>
                           </svg>
@@ -293,19 +293,21 @@ const Slider = ({
                         
                         <div className="ml-0 pt-1.5 pl-1.5 flex w-full flex-col 2md:ml-[0.5rem] lg:ml-0 2xl:ml-[0.5rem] justify-between">
                           <div className="w-full">
-                            <div className="h-4 bg-dark-100 rounded-full w-2/5 mb-2.5"></div>
-                            <div className="h-4 bg-dark-100 rounded-full w-1/3 mb-2.5"></div>
+                            <div className="h-4 bg-dark-150 rounded-full w-2/5 mb-2.5"/>
+                            <div className="h-4 bg-dark-150 rounded-full w-2/5 mb-2.5"/>
+                            <div className="h-4 bg-dark-150 rounded-full w-1/3 mb-2.5 bg-opacity-50"/>
                             
-                            <div className="h-3 bg-dark-100 rounded-full w-full mb-1.5"></div>
-                            <div className="h-3 bg-dark-100 rounded-full w-11/12 mb-1.5"></div>
-                            <div className="h-3 bg-dark-100 rounded-full w-[95%] mb-1.5"></div>
-                            <div className="h-3 bg-dark-100 rounded-full w-10/12 mb-1.5"></div>
-                            <div className="h-3 bg-dark-100 rounded-full w-2/5 mb-2.5"></div>
+                            <div className="h-3 bg-dark-150 rounded-full w-full mb-1.5 bg-opacity-75"/>
+                            <div className="h-3 bg-dark-150 rounded-full w-11/12 mb-1.5 bg-opacity-80"/>
+                            <div className="h-3 bg-dark-150 rounded-full w-[95%] mb-1.5
+                            bg-opacity-70"/>
+                            <div className="h-3 bg-dark-150 rounded-full w-10/12 mb-1.5 bg-opacity-80"/>
+                            <div className="h-3 bg-dark-150 rounded-full w-2/5 mb-2.5 bg-opacity-60"/>
                           </div>
 
                           <div className="h-10 w-full gap-x-3 flex flex-row justify-start">
-                            <div className="h-full bg-dark-100 rounded-md w-full py-2"></div>
-                            <div className="h-full bg-dark-100 rounded-md w-full py-2"></div>
+                            <div className="h-full bg-dark-150 rounded-md w-full py-2 bg-opacity-90"/>
+                            <div className="h-full bg-dark-150 rounded-md w-full py-2 bg-opacity-60"/>
                           </div>
                         </div>
                     

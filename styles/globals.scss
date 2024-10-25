@@ -106,7 +106,7 @@ textarea:-webkit-autofill {
     .slick-track {
       @apply flex h-auto items-center justify-center overflow-visible;
       .slick-slide {
-        @apply relative z-[1] mx-[1rem] h-[26rem] overflow-hidden rounded-md bg-red-200 duration-500 xs:mx-[1.5rem] sm:blur-[2px];
+        @apply relative z-[1] mx-[1rem] h-[26rem] overflow-hidden rounded-md duration-500 xs:mx-[1.5rem] sm:blur-[2px];
       }
       .slick-center {
         box-shadow: 0px 0px 9px 7.5px hsla(255, 17%, 9%, 50%);
