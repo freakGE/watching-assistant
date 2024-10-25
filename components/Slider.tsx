@@ -369,9 +369,8 @@ const Slider = ({
                                 slide.name ||
                                 "Poster"
                               }
-                              slider
+                              spinner={false}
                               onImageLoad={() => setAnimationValue(1)}
-                              // onImageLoad={() => setTimeout(() => setAnimationValue(1), 100)}
                               unoptimized={true}
                               className="z-[1] h-full rounded-md object-cover duration-300"
                             />

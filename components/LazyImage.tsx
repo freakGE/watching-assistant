@@ -11,7 +11,6 @@ type LazyImageProps = {
   spinner?: boolean;
   spinnerSize?: number;
   navbar?: boolean;
-  slider?: boolean
   onImageLoad?: () => void;
 } & ImageProps;
 
@@ -21,7 +20,6 @@ const LazyImage = ({
   children,
   spinner = true,
   spinnerSize = 3,
-  slider,
   navbar,
   onImageLoad,
   ...rest
@@ -31,7 +29,7 @@ const LazyImage = ({
 
   return (
     <div className="relative flex h-full w-full items-center justify-center text-dark-100">
-      {!slider && isLoading && spinner && (
+      {isLoading && spinner && (
         <div className="flex h-full w-full items-center justify-center">
           <Spinner
             className="absolute animate-spin"
