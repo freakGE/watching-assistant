@@ -17,7 +17,7 @@ export const PreloadMovie = ({ length, search = false }: PreloadType) => {
 
     useEffect(() => {
         width && width > 1536 ? setMovieLength(safeLength) : setMovieLength(search === true ? SEARCH_MOVIE_LENGTH: MOVIE_LENGTH)
-      }, [width])
+      }, [search, width])
 
     return (
         <>
