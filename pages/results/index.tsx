@@ -25,6 +25,7 @@ const LazyImage = dynamic(() => import("@/components/LazyImage"), {
 import Slider from "@/components/Slider";
 import { updateMoviesWithVariants } from "@/lib/getMovies";
 import { movieDetails } from "@/lib/navigate";
+import { PreloadMovie } from "@/components/Preload";
 
 const Pagination = dynamic(() => import("@/components/Pagination"), {
   loading: () => (
@@ -49,6 +50,7 @@ const SearchResults = ({ moviesData, search, type, page }: { moviesData: SearchM
   const queryType = router.query.type;
   const queryId = router.query.i;
   const [dropdownId, setDropdownId] = useState(null);
+  const [animationValue, setAnimationValue] = useState(0);
 
   const handleClick = async (title: any) => {
     const resolvedQueryType = typeof queryType === 'string' ? queryType : undefined;
@@ -130,13 +132,14 @@ const SearchResults = ({ moviesData, search, type, page }: { moviesData: SearchM
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="mt-[6rem] mb-[3rem] flex min-h-[calc(100vh-8rem-100px)] w-screen flex-col items-center justify-start justify-between sm:mt-[5rem]">
+      <main className="mt-[6rem] mb-[3rem] flex min-h-[calc(100vh-8rem-100px)] w-screen flex-col items-center justify-between sm:mt-[5rem]">
         <div className="wrapper mb-[2rem] h-full duration-200">
           <h2 className="mt-[0.5rem] mb-[1.7rem] text-xl font-semibold">
             Search results for:{" "}
             <span className="italic text-highlight-cyan">{querySearch}</span>
           </h2>
           <div className="grid grid-cols-1 gap-7 px-[2rem] 2exs:grid-cols-2 2exs:px-[0.5rem] 2xs:grid-cols-3 2xs:px-0 2md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6">
+            {animationValue === 0 && <PreloadMovie search={true} />}
             {movies &&
               movies.map((movie: any, i: number) => {
                 if (windowX && windowX > 1536) {
@@ -150,7 +153,8 @@ const SearchResults = ({ moviesData, search, type, page }: { moviesData: SearchM
                 return (
                   <div
                     key={movie.id}
-                    className=" flex flex-col rounded-md bg-dark-200 shadow-md duration-300 hover:shadow-xl"
+                    className="flex flex-col rounded-md bg-dark-200 shadow-md duration-300 hover:shadow-xl"
+                    style={{ visibility: animationValue === 0 ? "hidden" : "visible"}}
                   >
                     <button
                       onClick={() => handleClick(movie)}
@@ -159,7 +163,8 @@ const SearchResults = ({ moviesData, search, type, page }: { moviesData: SearchM
                       <LazyImage
                         src={`https://image.tmdb.org/t/p/w500` + img}
                         alt={movie.title || movie.name}
-                        unoptimized={true}
+                        spinner={false}
+                        onImageLoad={() => setAnimationValue(1)}
                         className="absolute flex h-full w-full scale-100 items-center justify-center bg-dark-150 text-center text-sm font-semibold text-dark-100
                           duration-[250ms] hover:scale-110"
                         draggable={false}

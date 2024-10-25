@@ -27,6 +27,7 @@ import { saveToDatabaseProps } from "@/lib/types";
 import useWindowDimensions from "@/components/WindowDimensions";
 import { updateMoviesWithVariants } from "@/lib/getMovies";
 import { movieDetails } from "@/lib/navigate";
+import { PreloadMovie } from "@/components/Preload";
 
 export default function Home({ moviesData, type, page }: { moviesData: MoviesType["popular"], type: "popular" | "trending", page: number }) {
   const { width } = useWindowDimensions();
@@ -38,7 +39,7 @@ export default function Home({ moviesData, type, page }: { moviesData: MoviesTyp
   const [dropdown, setDropdown] = useState<string | null>(null);
   const [trackMouse, setTrackMouse] = useState<[number, number]>([0, 0]);
   const [trackScroll, setTrackScroll] = useState<number | null>(null);
-
+  const [animationValue, setAnimationValue] = useState(0);
   const [dropdownId, setDropdownId] = useState(null);
 
   const handleClick = async (title: any) => {
@@ -51,6 +52,7 @@ export default function Home({ moviesData, type, page }: { moviesData: MoviesTyp
   const handleRemove = (variant: saveToDatabaseProps["variant"], title: any) => {
     removeFromDB(variant, title, data?.user, setDropdown)
   }
+
 
   useEffect(() => {
     updateMoviesWithVariants(moviesData, setMovies);
@@ -114,16 +116,17 @@ export default function Home({ moviesData, type, page }: { moviesData: MoviesTyp
         <Slider top={true} />
         <div className="wrapper h-full duration-200">
           <div className="my-[2rem] grid grid-rows-1 gap-7 px-[2rem] 2exs:grid-cols-2 2exs:px-[0.5rem] 2xs:grid-cols-3 2xs:px-0 2md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6">
+            {animationValue === 0 && <PreloadMovie />}
             {movies &&
               movies.map((movie: any, i: number) => {
                 if (width && width > 1536) {
                   if (i >= movies.length - 2) return;
                 }
-
                 return (
                   <div
                     key={movie.id}
-                    className=" flex flex-col rounded-md bg-dark-200 shadow-md duration-300 hover:shadow-xl"
+                    className="flex flex-col rounded-md bg-dark-200 shadow-md duration-300 hover:shadow-xl"
+                    style={{ visibility: animationValue === 0 ? "hidden" : "visible"}}
                   >
                     <button
                       onClick={() => handleClick(movie)}
@@ -134,6 +137,8 @@ export default function Home({ moviesData, type, page }: { moviesData: MoviesTyp
                           `https://image.tmdb.org/t/p/w500` + movie.poster_path
                         }
                         alt={movie.title}
+                        spinner={false}
+                        onImageLoad={() => setAnimationValue(1)}
                         className="absolute flex h-full w-full scale-100 items-center justify-center bg-dark-150 text-center text-sm font-semibold text-dark-100
                         duration-[250ms] hover:scale-110"
                         draggable={false}
