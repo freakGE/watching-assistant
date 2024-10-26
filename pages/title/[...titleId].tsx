@@ -154,8 +154,8 @@ const TitleDetail = (props: any) => {
             <div className="flex w-full  flex-col items-center justify-center sm:w-[13rem] sm:items-start">
               <div className="relative h-[15.5rem] w-[13rem] lg:h-[16rem] 2xl:h-[17rem]">
                 <Image
-                  loading="lazy"
-                  quality={100}
+                  loading="eager"
+                  quality={75}
                   unoptimized={true}
                   alt={
                     dataTMDB.name ||

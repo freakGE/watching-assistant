@@ -11,6 +11,9 @@ type LazyImageProps = {
   spinner?: boolean;
   spinnerSize?: number;
   navbar?: boolean;
+  priority?: boolean;
+  quality?: number;
+  unoptimized?: boolean;
   onImageLoad?: () => void;
 } & ImageProps;
 
@@ -21,6 +24,9 @@ const LazyImage = ({
   spinner = true,
   spinnerSize = 3,
   navbar,
+  priority = false,
+  quality = 25,
+  unoptimized = true,
   onImageLoad,
   ...rest
 }: LazyImageProps): JSX.Element => {
@@ -43,12 +49,12 @@ const LazyImage = ({
       <Image
         src={src}
         alt={alt || "Loading..."}
-        quality={100}
-        // quality={isLoading ? 1 : 100}
+        quality={quality}
         width={500}
         height={500}
-        priority
-        loading="eager"
+        loading={priority ? "eager" : "lazy"}
+        priority={priority}
+        unoptimized={unoptimized}
         onLoadingComplete={() => {
           setIsLoading(false);
           onImageLoad && onImageLoad();

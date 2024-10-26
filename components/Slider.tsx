@@ -318,7 +318,8 @@ const Slider = ({
             ))}
         
             {movies &&
-              movies.map(slide => {
+              movies.map((slide, i) => {
+                const priority = (i < 2 || i === movies.length - 1) ? true : false
                 const date = slide?.release_date || slide?.first_air_date;
                 const release = convertToReadableDate(date);
                 return (
@@ -327,7 +328,7 @@ const Slider = ({
                     className="relative flex h-[26rem] w-full max-w-[80rem] 2xs:w-10/12 items-center overflow-hidden bg-dark-300"
                   >
                     <Image
-                      priority
+                      priority={priority}
                       quality={10}
                       src={
                         slide.backdrop_path
@@ -336,6 +337,7 @@ const Slider = ({
                           : `https://image.tmdb.org/t/p/w500` +
                             slide.poster_path
                       }
+                      height={0}
                       width={0}
                       alt={
                         slide.title ||
@@ -343,9 +345,13 @@ const Slider = ({
                         slide.name ||
                         "Background Poster"
                       }
-                      fill
+                      loading={priority ? "eager" : "lazy"}
                       unoptimized={true}
-                      className="z-[0] object-cover opacity-80 blur-[2px]"
+                      className="absolute z-[0] object-cover opacity-80 blur-[2px]"
+                      style={{
+                        width: "auto",
+                        height: "416px"
+                      }}
                     />
                     <span className="absolute h-full w-full bg-dark-300 bg-opacity-50" />
                     <div className="absolute z-[1] flex h-full w-full items-center justify-center">
@@ -369,9 +375,9 @@ const Slider = ({
                                 slide.name ||
                                 "Poster"
                               }
+                              priority={priority}
                               spinner={false}
                               onImageLoad={() => setAnimationValue(1)}
-                              unoptimized={true}
                               className="z-[1] h-full rounded-md object-cover duration-300"
                             />
                           </button>

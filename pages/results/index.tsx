@@ -145,6 +145,7 @@ const SearchResults = ({ moviesData, search, type, page }: { moviesData: SearchM
                 if (windowX && windowX > 1536) {
                   if (i >= movies.length - 2) return;
                 }
+                const priority = (i < 5) ? true : false
                 const img =
                   movie.poster_path ||
                   movie.profile_path ||
@@ -166,8 +167,9 @@ const SearchResults = ({ moviesData, search, type, page }: { moviesData: SearchM
                         spinner={false}
                         onImageLoad={() => setAnimationValue(1)}
                         className="absolute flex h-full w-full scale-100 items-center justify-center bg-dark-150 text-center text-sm font-semibold text-dark-100
-                          duration-[250ms] hover:scale-110"
+                        duration-[250ms] hover:scale-110"
                         draggable={false}
+                        priority={priority}
                       />
                     </button>
                     <div className="relative w-full gap-2 rounded-md bg-dark-200 p-2">

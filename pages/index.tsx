@@ -122,6 +122,7 @@ export default function Home({ moviesData, type, page }: { moviesData: MoviesTyp
                 if (width && width > 1536) {
                   if (i >= movies.length - 2) return;
                 }
+                const priority = (i < 5) ? true : false
                 return (
                   <div
                     key={movie.id}
@@ -142,6 +143,7 @@ export default function Home({ moviesData, type, page }: { moviesData: MoviesTyp
                         className="absolute flex h-full w-full scale-100 items-center justify-center bg-dark-150 text-center text-sm font-semibold text-dark-100
                         duration-[250ms] hover:scale-110"
                         draggable={false}
+                        priority={priority}
                       />
                     </button>
                     <div className="relative w-full gap-2 rounded-md bg-dark-200 p-2">
