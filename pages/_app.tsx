@@ -1,12 +1,19 @@
 import "@/styles/globals.scss";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
-import dynamic from "next/dynamic";
 import { AppStateProvider } from "@/components/AppState";
 import { useRouter } from "next/router";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
-const Header = dynamic(() => import("../components/Header"));
-const Footer = dynamic(() => import("../components/Footer"));
+import { Montserrat } from "next/font/google";
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  display: "swap",
+  fallback: ['Arial', 'sans-serif']
+});
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -15,9 +22,11 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <AppStateProvider>
       <SessionProvider session={pageProps.session}>
-        {showLayout && <Header />}
-        <Component {...pageProps} />
-        {showLayout && <Footer />}
+        <main className={montserrat.className}>
+          {showLayout && <Header />}
+          <Component {...pageProps} />
+          {showLayout && <Footer />}
+        </main>
       </SessionProvider>
     </AppStateProvider>
   );
