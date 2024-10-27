@@ -1,6 +1,4 @@
-import dynamic from "next/dynamic";
-
-const Navbar = dynamic(() => import("./Navbar"));
+import Navbar from "./Navbar";
 
 const Header = (): JSX.Element => {
   return (
