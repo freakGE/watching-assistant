@@ -9,7 +9,7 @@ import {
 import { signIn, useSession } from "next-auth/react";
 import clientPromise from "@/lib/mongodb";
 import Link from "next/link";
-import Head from "next/head";
+import Head from "@/components/CustomHead"
 import { useRouter } from "next/router";
 
 type AccountType = {
@@ -162,30 +162,11 @@ const SignUp: NextPage = (userEmails: any): JSX.Element => {
 
   return (
     <>
-      <Head>
-        <title>Watching Assistant</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* Description */}
-        <meta
-          name="description"
-          content="Watching Assistant is a website for tracking movies and TV shows. Users can create watchlists, mark titles as watched or currently watching, and track their progress through TV shows by season and episode."
-        />
-        <meta
-          name="keywords"
-          content="watching, watching assistant, watchlist"
-        />
-        {/* Open Graph data */}
-        <meta property="og:title" content="Watching Assistant" />
-        <meta
-          property="og:description"
-          content="Watching Assistant is a website for tracking movies and TV shows. Users can create watchlists, mark titles as watched or currently watching, and track their progress through TV shows by season and episode."
-        />
-        <meta
-          property="og:image"
-          content={`${process.env.NEXT_PUBLIC_URL}/thumbnail.png`}
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <Head 
+        title="Sign Up - WA"
+        description="Create an account to start tracking your favorite movies and TV shows on Watching Assistant. Sign up now and join a community of entertainment enthusiasts."
+        keywords="signup, create account"
+      />
       <div className="flex h-screen w-screen items-center justify-center">
         {emailExist && (
           <div

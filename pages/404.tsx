@@ -1,4 +1,4 @@
-import Head from "next/head";
+import Head from "@/components/CustomHead"
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
@@ -38,30 +38,11 @@ const NotFound = () => {
   }, [isFlashing]);
   return (
     <>
-      <Head>
-        <title>404 - Page Not found</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* Description */}
-        <meta
-          name="description"
-          content="Watching Assistant is a website for tracking movies and TV shows. Users can create watchlists, mark titles as watched or currently watching, and track their progress through TV shows by season and episode."
-        />
-        <meta
-          name="keywords"
-          content="watching, watching assistant, watchlist"
-        />
-        {/* Open Graph data */}
-        <meta property="og:title" content="Watching Assistant" />
-        <meta
-          property="og:description"
-          content="Watching Assistant is a website for tracking movies and TV shows. Users can create watchlists, mark titles as watched or currently watching, and track their progress through TV shows by season and episode."
-        />
-        <meta
-          property="og:image"
-          content={`${process.env.NEXT_PUBLIC_URL}/thumbnail.png`}
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <Head 
+        title="Page Not found - WA"
+        description="This is awkward... You are looking for something that doesn't actualy exist. Return to the home page or explore other sections of Watching Assistant."
+        keywords="404, page not found, not found"
+      />
       <main className="wrapper-container mt-[6rem] min-h-[calc(100vh-6rem-100px)] sm:mt-[5rem] sm:min-h-[calc(100vh-5rem-100px)]">
         <div className="absolute z-[-1] h-[40%] w-full max-w-[40rem] md:w-2/3">
           <div className="relative h-full w-full">

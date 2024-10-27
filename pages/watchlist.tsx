@@ -1,5 +1,5 @@
 "use client";
-import Head from "next/head";
+import Head from "@/components/CustomHead"
 import { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { signIn, useSession } from "next-auth/react";
@@ -52,6 +52,13 @@ const variantTranslator = (str: string) => {
   if (str === "Completed") fixedVariant = "completed";
   return fixedVariant;
 };
+
+const WatchlistHead = () => {
+  return <Head 
+    title="Watchlist - WA"
+    description="Manage your watchlist of movies and TV shows on Watching Assistant. Add, remove, and track your favorites all in one place."
+  />
+}
 
 const Watchlist = () => {
   const { status, data } = useSession();
@@ -207,30 +214,7 @@ const Watchlist = () => {
   if (loading) {
     return (
       <>
-        <Head>
-          <title>Watching Assistant</title>
-          <meta name="viewport" content="width=device-width, initial-scale=1" />
-          {/* Description */}
-          <meta
-            name="description"
-            content="Watching Assistant is a website for tracking movies and TV shows. Users can create watchlists, mark titles as watched or currently watching, and track their progress through TV shows by season and episode."
-          />
-          <meta
-            name="keywords"
-            content="watching, watching assistant, watchlist"
-          />
-          {/* Open Graph data */}
-          <meta property="og:title" content="Watching Assistant" />
-          <meta
-            property="og:description"
-            content="Watching Assistant is a website for tracking movies and TV shows. Users can create watchlists, mark titles as watched or currently watching, and track their progress through TV shows by season and episode."
-          />
-          <meta
-            property="og:image"
-            content={`${process.env.NEXT_PUBLIC_URL}/thumbnail.png`}
-          />
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
+        <WatchlistHead/>
         <div className="flex min-h-screen w-screen items-center justify-center">
           <Spinner className="w-[3rem] animate-spin text-dark-100" />
         </div>
@@ -240,30 +224,7 @@ const Watchlist = () => {
 
   return (
     <>
-      <Head>
-        <title>Watchlist - WA</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* Description */}
-        <meta
-          name="description"
-          content="Watching Assistant is a website for tracking movies and TV shows. Users can create watchlists, mark titles as watched or currently watching, and track their progress through TV shows by season and episode."
-        />
-        <meta
-          name="keywords"
-          content="watching, watching assistant, watchlist"
-        />
-        {/* Open Graph data */}
-        <meta property="og:title" content="Watching Assistant" />
-        <meta
-          property="og:description"
-          content="Watching Assistant is a website for tracking movies and TV shows. Users can create watchlists, mark titles as watched or currently watching, and track their progress through TV shows by season and episode."
-        />
-        <meta
-          property="og:image"
-          content={`${process.env.NEXT_PUBLIC_URL}/thumbnail.png`}
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <WatchlistHead/>
       {extraForm && (
         <ExtraModal
           title={extraMovie}

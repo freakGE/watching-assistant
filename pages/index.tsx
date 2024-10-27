@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import Head from "next/head";
+import Head from "@/components/CustomHead"
 import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
 import { useEffect, useState, useRef } from "react";
@@ -88,30 +88,7 @@ export default function Home({ moviesData, type, page }: { moviesData: MoviesTyp
 
   return (
     <>
-      <Head>
-        <title>Watching Assistant</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* Description */}
-        <meta
-          name="description"
-          content="Watching Assistant is a website for tracking movies and TV shows. Users can create watchlists, mark titles as watched or currently watching, and track their progress through TV shows by season and episode."
-        />
-        <meta
-          name="keywords"
-          content="watching, watching assistant, watchlist"
-        />
-        {/* Open Graph data */}
-        <meta property="og:title" content="Watching Assistant" />
-        <meta
-          property="og:description"
-          content="Watching Assistant is a website for tracking movies and TV shows. Users can create watchlists, mark titles as watched or currently watching, and track their progress through TV shows by season and episode."
-        />
-        <meta
-          property="og:image"
-          content={`${process.env.NEXT_PUBLIC_URL}/thumbnail.png`}
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <Head/>
       <main className="wrapper-container mt-[6rem] min-h-[calc(100vh-6rem-100px)] flex-col items-center sm:mt-[5rem] sm:min-h-[calc(100vh-5rem-100px)]">
         <Slider top={true} />
         <div className="wrapper h-full duration-200">

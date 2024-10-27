@@ -1,6 +1,6 @@
 import { GetServerSideProps } from "next";
+import Head from "@/components/CustomHead"
 import dynamic from "next/dynamic";
-import Head from "next/head";
 import { useEffect, useRef, useState, useTransition } from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -105,42 +105,33 @@ const TitleDetail = (props: any) => {
     };
   }, [dropdown, trackMouse, trackScroll]);
 
+  const title = dataTMDB.name || dataTMDB.title || dataTMDB.Title
+  const genreNames = dataTMDB?.genres?.map((item: { name: string }) => item.name).join(', ') || '';
+  const releaseDate = dataTMDB.Released && dataTMDB.Released[0] === "0"
+    ? dataTMDB.Released.substring(1)
+    : dataTMDB.Released ||
+      convertToReadableDate(dataTMDB.release_date)
+
   return (
     <>
-      <Head>
-        {dataTMDB.name || dataTMDB.title || dataTMDB.Title ? (
-          dataTMDB.Title ? (
-            <title>{dataTMDB.Title}</title>
-          ) : dataTMDB.title ? (
-            <title>{dataTMDB.title}</title>
-          ) : (
-            <title>{dataTMDB.name}</title>
-          )
-        ) : (
-          <title>Watching Assistant</title>
-        )}
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* Description */}
-        <meta
-          name="description"
-          content="Watching Assistant is a website for tracking movies and TV shows. Users can create watchlists, mark titles as watched or currently watching, and track their progress through TV shows by season and episode."
-        />
-        <meta
-          name="keywords"
-          content="watching, watching assistant, watchlist"
-        />
-        {/* Open Graph data */}
-        <meta property="og:title" content="Watching Assistant" />
-        <meta
-          property="og:description"
-          content="Watching Assistant is a website for tracking movies and TV shows. Users can create watchlists, mark titles as watched or currently watching, and track their progress through TV shows by season and episode."
-        />
-        <meta
-          property="og:image"
-          content={`${process.env.NEXT_PUBLIC_URL}/thumbnail.png`}
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+        {(Math.round(dataTMDB.imdb_rating * 10) / 10 ||
+                Math.round(dataTMDB.vote_average * 10) / 10 ||
+                dataTMDB.imdbRating) && (
+                <div className="flex flex-wrap gap-x-1">
+                  <h3 className="font-semibold">Score:</h3>
+                  <p className="flex items-center justify-center text-dark-100">
+                    {Math.round(dataTMDB.imdb_rating * 10) / 10 ||
+                      Math.round(dataTMDB.vote_average * 10) / 10 ||
+                      dataTMDB.imdbRating}
+                  </p>
+                </div>
+              )}
+      <Head 
+        title={title ? `${title} - WA` : "Title - WA"} 
+        description={`Discover everything about ${title}${dataTMDB.release_date || dataTMDB.Released ? `, a ${dataTMDB.type === "tv" ? "TV Series".toLowerCase() : "Movie".toLowerCase()} released on ${releaseDate}` : ''}. With a score of ${Math.round(dataTMDB.imdb_rating * 10) / 10 || Math.round(dataTMDB.vote_average * 10) / 10 || dataTMDB.imdbRating}, this title falls under the genres: ${genreNames}. Status: ${dataTMDB.status}.`}
+        image={dataTMDB.poster_path ? `https://image.tmdb.org/t/p/w500` + dataTMDB.poster_path: undefined}
+        keywords={title ? `${title}, ${title.split(/[, &]+/).map((word: string) => word.trim()).join(", ")}, Trailer, Credits, Rating` : undefined}
+      />
       {extraForm && (
         <ExtraModal
           title={dataTMDB}
@@ -481,7 +472,6 @@ const TitleDetail = (props: any) => {
             </div>
             <div className="flex w-full flex-col items-center justify-center sm:items-start">
               <h3 className="my-5 text-center text-xl text-[1.4rem] font-semibold sm:mt-0 sm:text-start">
-                {/* {dataTMDB.name || dataTMDB.title || dataTMDB.Title} */}
                 {dataTMDB.extra && dataTMDB.extra.url ? (
                   <Link
                     href={dataTMDB.extra.url}
@@ -504,11 +494,9 @@ const TitleDetail = (props: any) => {
                       <polyline points="15 3 21 3 21 9"></polyline>
                       <line x1="10" y1="14" x2="21" y2="3"></line>
                     </svg>
-                    {dataTMDB.name || dataTMDB.title || dataTMDB.Title}{" "}
+                    {title}{" "}
                   </Link>
-                ) : (
-                  dataTMDB.name || dataTMDB.title || dataTMDB.Title
-                )}
+                ) : title}
               </h3>
               {/* //! */}
 
@@ -826,10 +814,7 @@ const TitleDetail = (props: any) => {
                 <div className="flex flex-wrap gap-x-1">
                   <h3 className="font-semibold">Released:</h3>
                   <p className="text-dark-100">
-                    {dataTMDB.Released && dataTMDB.Released[0] === "0"
-                      ? dataTMDB.Released.substring(1)
-                      : dataTMDB.Released ||
-                        convertToReadableDate(dataTMDB.release_date)}
+                    {releaseDate}
                   </p>
                 </div>
               )}

@@ -10,7 +10,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 
 import { ValidateEmail, ValidatePassword } from "@/components/ValidateForm";
-import Head from "next/head";
+import Head from "@/components/CustomHead"
 
 const SignIn: NextPage = (): JSX.Element => {
   const validateEmail = ValidateEmail;
@@ -79,30 +79,6 @@ const SignIn: NextPage = (): JSX.Element => {
     }
   }, [status]);
 
-  // useEffect(() => {
-  //   if (wrongEmail === true || wrongPassword === true) {
-  //     setModalTranslateY(300);
-  //     setTimeout(() => {
-  //       setModalIndex(2);
-  //       setTimeout(() => {
-  //         setModalTranslateY(240);
-  //         setTimeout(() => {
-  //           setModalTranslateY(300);
-  //           setTimeout(() => {
-  //             setModalIndex(1);
-  //             setTimeout(() => {
-  //               setModalTranslateY(240);
-  //               setTimeout(() => {
-  //                 setWrongEmail(false);
-  //                 setWrongPassword(false);
-  //               }, 750);
-  //             }, 150);
-  //           }, 500);
-  //         }, 1950);
-  //       }, 150);
-  //     }, 500);
-  //   }
-  // }, [wrongEmail, wrongPassword]);
   useEffect(() => {
     if (invalidCredintials) {
       setModalTranslateY(300);
@@ -129,30 +105,11 @@ const SignIn: NextPage = (): JSX.Element => {
 
   return (
     <>
-      <Head>
-        <title>Watching Assistant</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* Description */}
-        <meta
-          name="description"
-          content="Watching Assistant is a website for tracking movies and TV shows. Users can create watchlists, mark titles as watched or currently watching, and track their progress through TV shows by season and episode."
-        />
-        <meta
-          name="keywords"
-          content="watching, watching assistant, watchlist"
-        />
-        {/* Open Graph data */}
-        <meta property="og:title" content="Watching Assistant" />
-        <meta
-          property="og:description"
-          content="Watching Assistant is a website for tracking movies and TV shows. Users can create watchlists, mark titles as watched or currently watching, and track their progress through TV shows by season and episode."
-        />
-        <meta
-          property="og:image"
-          content={`${process.env.NEXT_PUBLIC_URL}/thumbnail.png`}
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <Head 
+        title="Sign In - WA"
+        description="Access your Watching Assistant account to track your favorite movies and shows."
+        keywords="signin, login, Google, GitHub"
+      />
       <div className="flex h-screen w-screen items-center justify-center">
         {/* {(wrongEmail === true || wrongPassword === true) && ( */}
         {invalidCredintials && (

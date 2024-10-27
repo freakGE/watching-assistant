@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import Head from "next/head";
+import Head from "@/components/CustomHead"
 import { useRouter } from "next/router";
 import { useEffect, useState, useRef } from "react";
 import { GetServerSideProps } from "next";
@@ -32,6 +32,15 @@ const Pagination = dynamic(() => import("@/components/Pagination"), {
     <Spinner className="z-[1] w-[3.5rem] animate-spin text-dark-100" />
   ),
 });
+
+const formatString = (input: string | string[], separator: string = ", ") => {
+  const inputString = Array.isArray(input) ? input.join(" ") : input;
+
+  return inputString
+    .split(/[, &]+/) 
+    .map((word: string) => word.trim()) 
+    .join(separator); 
+};
 
 const SearchResults = ({ moviesData, search, type, page }: { moviesData: SearchMultiTypes, search: string, type: string, page: number }) => {
   const { data } = useSession();
@@ -103,35 +112,11 @@ const SearchResults = ({ moviesData, search, type, page }: { moviesData: SearchM
 
   return (
     <>
-      <Head>
-        {querySearch ? (
-          <title>{querySearch ? querySearch.toString() : "Find"} - WA</title>
-        ) : (
-          <title>Watching Assistant</title>
-        )}
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* Description */}
-        <meta
-          name="description"
-          content="Watching Assistant is a website for tracking movies and TV shows. Users can create watchlists, mark titles as watched or currently watching, and track their progress through TV shows by season and episode."
-        />
-        <meta
-          name="keywords"
-          content="watching, watching assistant, watchlist"
-        />
-        {/* Open Graph data */}
-        <meta property="og:title" content="Watching Assistant" />
-        <meta
-          property="og:description"
-          content="Watching Assistant is a website for tracking movies and TV shows. Users can create watchlists, mark titles as watched or currently watching, and track their progress through TV shows by season and episode."
-        />
-        <meta
-          property="og:image"
-          content={`${process.env.NEXT_PUBLIC_URL}/thumbnail.png`}
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
+      <Head 
+        title={querySearch ? `${querySearch.toString()} - WA` : "Find - WA"} 
+        description={`Search results${querySearch ? ` for "${querySearch.toString()}"` : ''} - Find movies and TV shows to add to your watchlist on Watching Assistant.`}
+        keywords={querySearch ? `${querySearch}, ${formatString(querySearch)}, search, search movies, search tv shows, search title` : undefined}
+      />
       <main className="mt-[6rem] mb-[3rem] flex min-h-[calc(100vh-8rem-100px)] w-screen flex-col items-center justify-between sm:mt-[5rem]">
         <div className="wrapper mb-[2rem] h-full duration-200">
           <h2 className="mt-[0.5rem] mb-[1.7rem] text-xl font-semibold">

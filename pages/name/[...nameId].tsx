@@ -1,17 +1,7 @@
 import { GetServerSideProps } from "next";
-import dynamic from "next/dynamic";
-import Head from "next/head";
+import Head from "@/components/CustomHead"
 import Image from "next/image";
 
-const Spinner = dynamic(() => import("@/components/Spinner"), {
-  loading: () => <div>Loading...</div>,
-});
-
-// const Slider = dynamic(() => import("@/components/Slider"), {
-//   loading: () => (
-//     <Spinner className="z-[1] w-[3.5rem] animate-spin text-dark-100" />
-//   ),
-// });
 import Slider from "@/components/Slider";
 
 function convertToReadableDate(dateStr: string): string {
@@ -21,36 +11,15 @@ function convertToReadableDate(dateStr: string): string {
 
 const nameDetails = (props: any) => {
   const person = props.data;
+  
   return (
     <>
-      <Head>
-        {person.name ? (
-          <title>{person.name} - WA</title>
-        ) : (
-          <title>Watching Assistant</title>
-        )}
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* Description */}
-        <meta
-          name="description"
-          content="Watching Assistant is a website for tracking movies and TV shows. Users can create watchlists, mark titles as watched or currently watching, and track their progress through TV shows by season and episode."
-        />
-        <meta
-          name="keywords"
-          content="watching, watching assistant, watchlist"
-        />
-        {/* Open Graph data */}
-        <meta property="og:title" content="Watching Assistant" />
-        <meta
-          property="og:description"
-          content="Watching Assistant is a website for tracking movies and TV shows. Users can create watchlists, mark titles as watched or currently watching, and track their progress through TV shows by season and episode."
-        />
-        <meta
-          property="og:image"
-          content={`${process.env.NEXT_PUBLIC_URL}/thumbnail.png`}
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <Head 
+        title={person.name ? `${person.name} - WA` : "Biography - WA"} 
+        description={`Discover everything about ${person.name}, including their filmography, notable roles, and achievements in the entertainment industry. Explore the movies and TV shows featuring ${person.name} and learn more about their contributions to cinema.`}
+        image={person.profile_path ? `https://image.tmdb.org/t/p/w500` + person.profile_path : undefined}
+        keywords={person.name ? `${person.name}, ${person.name.split(/[, &]+/).map((word: string) => word.trim()).join(", ")}, Biography, Credits, Rating` : undefined}
+      />
       <main className="mt-[6rem] flex min-h-[calc(100vh-6rem)] w-screen flex-col items-center  sm:mt-[5rem]">
         <div className="wrapper mt-[1rem] flex h-full justify-center">
           <div className="flex h-full flex-col sm:flex-row sm:items-start sm:gap-x-[2rem]">
