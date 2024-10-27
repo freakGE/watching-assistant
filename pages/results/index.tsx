@@ -127,7 +127,7 @@ const SearchResults = ({ moviesData, search, type, page }: { moviesData: SearchM
             {animationValue === 0 && <PreloadMovie search={true} />}
             {movies &&
               movies.map((movie: any, i: number) => {
-                if (windowX && windowX > 1536) {
+                if (movies.length === 20 && windowX && windowX > 1536) {
                   if (i >= movies.length - 2) return;
                 }
                 const priority = (i < 5) ? true : false

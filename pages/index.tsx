@@ -96,7 +96,7 @@ export default function Home({ moviesData, type, page }: { moviesData: MoviesTyp
             {animationValue === 0 && <PreloadMovie />}
             {movies &&
               movies.map((movie: any, i: number) => {
-                if (width && width > 1536) {
+                if (movies.length === 20 && width && width > 1536) {
                   if (i >= movies.length - 2) return;
                 }
                 const priority = (i < 5) ? true : false
