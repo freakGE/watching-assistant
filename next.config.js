@@ -3,8 +3,10 @@ const nextConfig = {
   reactStrictMode: true,
   env: {
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+  },  
+  sassOptions: {
+    silenceDeprecations: ['legacy-js-api'],
   },
-
   images: {
     remotePatterns: [
       {
