@@ -55,7 +55,7 @@ const LazyImage = ({
         loading={priority ? "eager" : "lazy"}
         priority={priority}
         unoptimized={unoptimized}
-        onLoadingComplete={() => {
+        onLoad={() => {
           setIsLoading(false);
           onImageLoad && onImageLoad();
         }}
